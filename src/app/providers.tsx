@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from '@/theme';
 import FaceShapeProvider from '@/contexts/FaceShapeContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -20,9 +21,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <FaceShapeProvider>
-        {children}
-      </FaceShapeProvider>
+      <AuthProvider>
+        <FaceShapeProvider>
+          {children}
+        </FaceShapeProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 } 
