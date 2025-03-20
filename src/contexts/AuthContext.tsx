@@ -20,28 +20,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Sayfa yüklendiğinde authentication durumunu kontrol et
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
     try {
       // Backend'den auth durumunu kontrol et
-      const response = await fetch('/api/auth/check', {
-        credentials: 'include', // Cookie'leri göndermek için önemli
-      });
+      const response = await authService.checkAuthStatus();
+      setIsAuthenticated(response);
       
-      if (response.ok) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
     } catch (err) {
       setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await authService.login(credentials);
       if (response.isSuccess) {
         setIsAuthenticated(true);
-        router.push('/dashboard');
+        router.push('/seller');
       } else {
         setError(response.message);
       }
@@ -70,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await authService.register(userData);
       if (response.isSuccess) {
         setIsAuthenticated(true);
-        router.push('/dashboard');
+        router.push('/seller');
       } else {
         setError(response.message);
       }
