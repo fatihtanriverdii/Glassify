@@ -11,7 +11,7 @@ interface AnalysisResult {
 }
 
 interface CameraCaptureProps {
-  onAnalysisComplete: (result: AnalysisResult | null) => void;
+  onAnalysisComplete: (result: AnalysisResult | null, image: string | null) => void;
 }
 
 const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => {
@@ -63,7 +63,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => 
           probabilities: Object.fromEntries(
             Object.entries(result.class_probabilities as Record<string, string>).map(([key, value]) => [key, parseFloat(value)])
           )
-        });
+        }, capturedImage);
       }
     } catch (error) {
       console.error('Yüz şekli analizi sırasında hata:', error);
@@ -77,7 +77,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => 
     setCapturedImage(null);
     setError(null);
     if (onAnalysisComplete) {
-      onAnalysisComplete(null);
+      onAnalysisComplete(null, null);
     }
   };
 

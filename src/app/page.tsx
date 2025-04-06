@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Container, Box, Typography, Paper, Tabs, Tab } from '@mui/material';
 import CameraCapture from '@/components/Camera/cameraCapture';
 import PhotoUpload from '@/components/Photo/photoUpload';
+import { FaceAnalysis } from '@/components/FaceAnalysis';
 
 interface AnalysisResult {
   shape: string;
@@ -11,10 +12,19 @@ interface AnalysisResult {
   probabilities: Record<string, number>;
 }
 
+interface FaceAnalysisResult {
+  faceType: string;
+  confidence: number;
+  otherProbabilities: {
+    [key: string]: number;
+  };
+}
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<FaceAnalysisResult | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -29,8 +39,21 @@ export default function Home() {
     setAnalysisResult(null);
   };
 
-  const handleAnalysisComplete = (result: AnalysisResult | null) => {
-    setAnalysisResult(result);
+  const handleAnalysisComplete = (result: AnalysisResult | null, image?: string) => {
+    if (result) {
+      // Convert AnalysisResult to FaceAnalysisResult
+      setAnalysisResult({
+        faceType: result.shape,
+        confidence: result.confidence,
+        otherProbabilities: result.probabilities
+      });
+    } else {
+      setAnalysisResult(null);
+    }
+    
+    if (image) {
+      setCapturedImage(image);
+    }
   };
 
   return (
@@ -64,7 +87,7 @@ export default function Home() {
             Analiz Sonucu
           </Typography>
           <Typography variant="body1" gutterBottom>
-            Yüz Şekli: <strong>{analysisResult.shape}</strong>
+            Yüz Şekli: <strong>{analysisResult.faceType}</strong>
           </Typography>
           <Typography variant="body1" gutterBottom>
             Güven Oranı: <strong>{(analysisResult.confidence * 100).toFixed(2)}%</strong>
@@ -73,7 +96,7 @@ export default function Home() {
             Diğer Olasılıklar:
           </Typography>
           <Box component="ul" sx={{ pl: 2 }}>
-            {Object.entries(analysisResult.probabilities)
+            {Object.entries(analysisResult.otherProbabilities)
               .sort(([, a], [, b]) => b - a)
               .map(([shape, probability]) => (
                 <Typography component="li" key={shape}>
@@ -82,6 +105,13 @@ export default function Home() {
               ))}
           </Box>
         </Paper>
+      )}
+
+      {analysisResult && capturedImage && (
+        <FaceAnalysis
+          analysisResult={analysisResult}
+          capturedImage={capturedImage}
+        />
       )}
     </Container>
   );

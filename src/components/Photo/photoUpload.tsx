@@ -10,7 +10,7 @@ interface AnalysisResult {
 }
 
 interface PhotoUploadProps {
-  onAnalysisComplete: (result: AnalysisResult | null) => void;
+  onAnalysisComplete: (result: AnalysisResult | null, image: string | null) => void;
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
@@ -61,7 +61,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
       fileInputRef.current.value = '';
     }
     if (onAnalysisComplete) {
-      onAnalysisComplete(null);
+      onAnalysisComplete(null, null);
     }
   };
 
@@ -89,7 +89,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
           probabilities: Object.fromEntries(
             Object.entries(result.class_probabilities as Record<string, string>).map(([key, value]) => [key, parseFloat(value)])
           )
-        });
+        }, selectedImage);
       }
     } catch (error) {
       console.error('Yüz şekli analizi sırasında hata:', error);
