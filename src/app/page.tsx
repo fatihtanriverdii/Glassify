@@ -39,7 +39,7 @@ export default function Home() {
     setAnalysisResult(null);
   };
 
-  const handleAnalysisComplete = (result: AnalysisResult | null, image?: string) => {
+  const handleAnalysisComplete = (result: AnalysisResult | null, image: string | null) => {
     if (result) {
       // Convert AnalysisResult to FaceAnalysisResult
       setAnalysisResult({
@@ -76,33 +76,20 @@ export default function Home() {
       </Paper>
 
       {activeTab === 0 ? (
-        <CameraCapture onAnalysisComplete={handleAnalysisComplete} />
+        <CameraCapture onAnalysisComplete={(result, image) => handleAnalysisComplete(result, image)} />
       ) : (
-        <PhotoUpload onAnalysisComplete={handleAnalysisComplete} />
+        <PhotoUpload onAnalysisComplete={(result, image) => handleAnalysisComplete(result, image)} />
       )}
 
       {analysisResult && (
         <Paper sx={{ mt: 3, p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Analiz Sonucu
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            Yüz Şekli: <strong>{analysisResult.faceType}</strong>
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            Güven Oranı: <strong>{(analysisResult.confidence * 100).toFixed(2)}%</strong>
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            Diğer Olasılıklar:
-          </Typography>
-          <Box component="ul" sx={{ pl: 2 }}>
-            {Object.entries(analysisResult.otherProbabilities)
-              .sort(([, a], [, b]) => b - a)
-              .map(([shape, probability]) => (
-                <Typography component="li" key={shape}>
-                  {shape}: {(probability * 100).toFixed(2)}%
-                </Typography>
-              ))}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <Typography variant="h6" gutterBottom>
+              Yüz Şekli: {analysisResult.faceType}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              Güven Skoru: %{Math.min(100, (analysisResult.confidence)).toFixed(0)}
+            </Typography>
           </Box>
         </Paper>
       )}

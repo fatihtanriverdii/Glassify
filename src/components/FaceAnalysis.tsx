@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { tryOnGlasses } from '@/services/glassesService';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AnalysisResult {
   faceType: string;
@@ -11,6 +12,12 @@ interface AnalysisResult {
   };
 }
 
+interface Glass {
+  id: number;
+  image: string;
+  glassesType: string;
+}
+
 export const FaceAnalysis: React.FC<{
   analysisResult: AnalysisResult;
   capturedImage: string;
@@ -18,62 +25,61 @@ export const FaceAnalysis: React.FC<{
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [sizeMultiplier, setSizeMultiplier] = useState<number>(2.5); // Default size multiplier
+  const [sizeMultiplier, setSizeMultiplier] = useState<number>(2.5);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [glasses, setGlasses] = useState<Glass[]>([]);
+  const [selectedGlassIndex, setSelectedGlassIndex] = useState<number>(0);
   const { toast } = useToast();
 
-  const tryOnGlassesHandler = async () => {
-    setLoading(true);
-    setError(null);
-
+  const fetchGlasses = async (pageNumber: number) => {
     try {
-      console.log('Face type:', analysisResult.faceType);
-      
-      // Ensure capturedImage is in base64 format
-      const base64Image = capturedImage.includes('base64,') 
-        ? capturedImage 
-        : `data:image/jpeg;base64,${capturedImage}`;
-
-      console.log('Image format check:', {
-        originalLength: capturedImage.length,
-        processedLength: base64Image.length,
-        hasBase64Prefix: base64Image.includes('base64,')
-      });
-
-      // Get glasses recommendation based on face type
-      console.log('Fetching glasses recommendations...');
-      const response = await fetch(`http://localhost:7289/api/Glasses/suitable/glasses?FaceType=${analysisResult.faceType}`, {
+      const response = await fetch(`http://localhost:7289/api/Glasses/suitable/glasses?FaceType=${analysisResult.faceType}&pageNumber=${pageNumber}&pageSize=5`, {
         headers: {
           'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}`,
           'Content-Type': 'application/json'
         }
       });
 
-      console.log('Glasses recommendation response status:', response.status);
-
       if (!response.ok) {
         throw new Error('Gözlük önerileri alınamadı');
       }
 
-      const glasses = await response.json();
-      console.log('Received glasses:', glasses);
-
-      if (!glasses || !Array.isArray(glasses) || glasses.length === 0) {
+      const data = await response.json();
+      if (!data || !data.items || !Array.isArray(data.items) || data.items.length === 0) {
         throw new Error('Yüz tipinize uygun gözlük bulunamadı');
       }
 
-      console.log('Selected glasses:', glasses[0]);
+      setGlasses(data.items);
+      setSelectedGlassIndex(0);
+      return data.items[0];
+    } catch (error) {
+      console.error('Gözlük getirme hatası:', error);
+      throw error;
+    }
+  };
 
-      // Try on the first recommended glasses with custom size multiplier
-      console.log('Trying on glasses...');
-      const result = await tryOnGlasses(base64Image, glasses[0].image, sizeMultiplier);
+  const tryOnGlassesHandler = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const base64Image = capturedImage.includes('base64,') 
+        ? capturedImage 
+        : `data:image/jpeg;base64,${capturedImage}`;
+
+      let selectedGlass;
+      if (glasses.length === 0) {
+        selectedGlass = await fetchGlasses(currentPage);
+      } else {
+        selectedGlass = glasses[selectedGlassIndex];
+      }
+
+      const result = await tryOnGlasses(base64Image, selectedGlass.image, sizeMultiplier);
       
       if (!result) {
         throw new Error('Gözlük deneme sonucu alınamadı');
       }
 
-      console.log('Try-on result received, length:', result.length);
-
-      // Ensure the result is in base64 format
       const finalImage = result.includes('base64,') ? result : `data:image/jpeg;base64,${result}`;
       setProcessedImage(finalImage);
       
@@ -82,13 +88,6 @@ export const FaceAnalysis: React.FC<{
         description: 'Gözlük deneme işlemi tamamlandı',
       });
     } catch (err) {
-      console.error('Detailed error in tryOnGlassesHandler:', {
-        error: err,
-        type: err instanceof Error ? 'Error' : typeof err,
-        message: err instanceof Error ? err.message : String(err),
-        stack: err instanceof Error ? err.stack : undefined
-      });
-      
       const errorMessage = err instanceof Error ? err.message : 'Gözlük deneme işlemi başarısız oldu';
       setError(errorMessage);
       
@@ -99,6 +98,40 @@ export const FaceAnalysis: React.FC<{
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleNextGlass = async () => {
+    if (selectedGlassIndex < glasses.length - 1) {
+      setSelectedGlassIndex(prev => prev + 1);
+    } else {
+      try {
+        setCurrentPage(prev => prev + 1);
+        await fetchGlasses(currentPage + 1);
+      } catch (error) {
+        toast({
+          title: 'Hata',
+          description: 'Daha fazla gözlük bulunamadı',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const handlePrevGlass = async () => {
+    if (selectedGlassIndex > 0) {
+      setSelectedGlassIndex(prev => prev - 1);
+    } else if (currentPage > 1) {
+      try {
+        setCurrentPage(prev => prev - 1);
+        await fetchGlasses(currentPage - 1);
+      } catch (error) {
+        toast({
+          title: 'Hata',
+          description: 'Önceki gözlükler getirilemedi',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
@@ -115,6 +148,48 @@ export const FaceAnalysis: React.FC<{
               className="w-full rounded-lg"
             />
           </div>
+
+          {glasses.length > 0 && (
+            <div className="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePrevGlass}
+                disabled={currentPage === 1 && selectedGlassIndex === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="text-center">
+                <p className="font-medium">Gözlük {selectedGlassIndex + 1}/{glasses.length}</p>
+                <p className="text-sm text-gray-500">Sayfa {currentPage}</p>
+              </div>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNextGlass}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {glasses.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Seçili Gözlük</h3>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <img
+                  src={`data:image/jpeg;base64,${glasses[selectedGlassIndex].image}`}
+                  alt={`Gözlük ${selectedGlassIndex + 1}`}
+                  className="w-full h-32 object-contain"
+                />
+                <div className="mt-2 text-center">
+                  <p className="text-sm text-gray-600">Tip: {glasses[selectedGlassIndex].glassesType}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label htmlFor="size-slider" className="block text-sm font-medium text-gray-700">

@@ -279,4 +279,31 @@ export const tryOnGlasses = async (faceImage: string, glassesImage: string, size
             ? error 
             : new Error('Gözlük deneme işlemi sırasında bir hata oluştu');
     }
+};
+
+export const deleteGlasses = async (glassId: string): Promise<{ isSuccess: boolean; message: string }> => {
+    try {
+        const token = getCookie('token') as string;
+        const decoded = jwtDecode(token) as DecodedToken;
+
+        const response = await fetch(`${API_URL}/User/delete/glasses/${glassId}?email=${decoded.email}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        return {
+            isSuccess: data.isSuccess,
+            message: data.message || 'Gözlük başarıyla silindi'
+        };
+    } catch (error) {
+        console.error('Gözlük silinirken hata:', error);
+        return {
+            isSuccess: false,
+            message: 'Gözlük silinirken bir hata oluştu'
+        };
+    }
 }; 
