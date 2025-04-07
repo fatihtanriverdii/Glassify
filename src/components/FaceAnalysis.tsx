@@ -18,6 +18,7 @@ export const FaceAnalysis: React.FC<{
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [sizeMultiplier, setSizeMultiplier] = useState<number>(2.5); // Default size multiplier
   const { toast } = useToast();
 
   const tryOnGlassesHandler = async () => {
@@ -62,9 +63,9 @@ export const FaceAnalysis: React.FC<{
 
       console.log('Selected glasses:', glasses[0]);
 
-      // Try on the first recommended glasses
+      // Try on the first recommended glasses with custom size multiplier
       console.log('Trying on glasses...');
-      const result = await tryOnGlasses(base64Image, glasses[0].image);
+      const result = await tryOnGlasses(base64Image, glasses[0].image, sizeMultiplier);
       
       if (!result) {
         throw new Error('Gözlük deneme sonucu alınamadı');
@@ -113,6 +114,31 @@ export const FaceAnalysis: React.FC<{
               alt="Analiz edilen fotoğraf"
               className="w-full rounded-lg"
             />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="size-slider" className="block text-sm font-medium text-gray-700">
+              Gözlük Boyutu
+            </label>
+            <input
+              type="range"
+              id="size-slider"
+              min="1.5"
+              max="3.5"
+              step="0.1"
+              value={sizeMultiplier}
+              onChange={(e) => {
+                setSizeMultiplier(parseFloat(e.target.value));
+                if (processedImage) {
+                  tryOnGlassesHandler();
+                }
+              }}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Küçük</span>
+              <span>Büyük</span>
+            </div>
           </div>
 
           <Button

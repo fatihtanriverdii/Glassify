@@ -150,7 +150,7 @@ export const getSellerGlasses = async (): Promise<GetGlassesResponse> => {
     }
 };
 
-export const tryOnGlasses = async (faceImage: string, glassesImage: string): Promise<string> => {
+export const tryOnGlasses = async (faceImage: string, glassesImage: string, sizeMultiplier: number = 2.5): Promise<string> => {
     try {
         // Load face-api.js models if not already loaded
         await loadModels();
@@ -238,8 +238,8 @@ export const tryOnGlasses = async (faceImage: string, glassesImage: string): Pro
             }
         });
 
-        // Calculate glasses dimensions
-        const glassesWidth = eyeDistance * 2.5;
+        // Calculate glasses dimensions using the provided size multiplier
+        const glassesWidth = eyeDistance * sizeMultiplier;
         const glassesHeight = (glassesWidth * glassesImg.height) / glassesImg.width;
 
         // Calculate glasses position
@@ -255,6 +255,9 @@ export const tryOnGlasses = async (faceImage: string, glassesImage: string): Pro
         ctx.translate(centerX, centerY);
         ctx.rotate(angle * Math.PI / 180);
         ctx.translate(-centerX, -centerY);
+
+        // Set opacity for glasses
+        ctx.globalAlpha = 0.85;
 
         // Draw glasses
         ctx.drawImage(
