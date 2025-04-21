@@ -14,7 +14,6 @@ ENV PATH /app/node_modules/.bin:$PATH
 # Proje dosyalarını kopyala
 COPY . .
 
-
 # Dosya izinlerini düzelt
 RUN chmod -R 755 /app
 
