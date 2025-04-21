@@ -33,7 +33,7 @@ export const FaceAnalysis: React.FC<{
 
   const fetchGlasses = async (pageNumber: number) => {
     try {
-      const response = await fetch(`http://localhost:7289/api/Glasses/suitable/glasses?FaceType=${analysisResult.faceType}&pageNumber=${pageNumber}&pageSize=5`, {
+      const response = await fetch(`https://glassify-api-791546846158.europe-west1.run.app/api/Glasses/suitable/glasses?FaceType=${analysisResult.faceType}&pageNumber=${pageNumber}&pageSize=5`, {
         headers: {
           'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}`,
           'Content-Type': 'application/json'
