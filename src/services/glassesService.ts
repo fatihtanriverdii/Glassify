@@ -2,7 +2,7 @@ import { getCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
 import * as faceapi from '@vladmandic/face-api';
 
-const API_URL = 'https://glassify-api-791546846158.europe-west1.run.app/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 export type FaceType = 'Round' | 'Square' | 'Oval' | 'Heart' | 'Oblong';
 export type GlassesType = 'Round' | 'CatEye' | 'Rectangle' | 'Square' | 'Aviator' | 'Geometric' | 'Browline' | 'Oval';
@@ -112,7 +112,8 @@ export const getSellerGlasses = async (): Promise<GetGlassesResponse> => {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: 'include'
         });
 
         if (!response.ok) {
