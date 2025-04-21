@@ -1,6 +1,6 @@
 import { LoginRequest, RegisterRequest, AuthResponse } from '../types/auth';
 
-const API_URL = 'http://localhost:7289/api';
+const API_URL = 'https://glassify-api-791546846158.europe-west1.run.app/api';
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {

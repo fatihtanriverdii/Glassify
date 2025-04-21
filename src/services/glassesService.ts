@@ -2,7 +2,7 @@ import { getCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
 import * as faceapi from '@vladmandic/face-api';
 
-const API_URL = 'http://localhost:7289/api';
+const API_URL = 'https://glassify-api-791546846158.europe-west1.run.app/api';
 
 export type FaceType = 'Round' | 'Square' | 'Oval' | 'Heart' | 'Oblong';
 export type GlassesType = 'Round' | 'CatEye' | 'Rectangle' | 'Square' | 'Aviator' | 'Geometric' | 'Browline' | 'Oval';
