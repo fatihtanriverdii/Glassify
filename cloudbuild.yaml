@@ -1,0 +1,28 @@
+steps:
+  # 1. Docker image oluştur
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/glassify-frontend', '.']
+
+  # 2. Container Registry'ye pushla
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/glassify-frontend']
+
+  # 3. Cloud Run'a deploy et
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'glassify-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/glassify-frontend'
+      - '--region'
+      - 'europe-west1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
