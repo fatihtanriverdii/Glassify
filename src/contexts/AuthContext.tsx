@@ -30,22 +30,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuthStatus = async () => {
     try {
       // Check for token in localStorage first
-      const token = localStorage.getItem('token') || 
-        document.cookie
-          .split('; ')
-          .find(row => row.startsWith('token='))
-          ?.split('=')[1];
+      const token = localStorage.getItem('token');
 
       if (!token) {
         setIsAuthenticated(false);
+        setLoading(false);
         return;
       }
 
       // Backend'den auth durumunu kontrol et
       const response = await authService.checkAuthStatus();
-      setIsAuthenticated(response);
+      if (response) {
+        setIsAuthenticated(true);
+      } else {
+        // If token is invalid, clear it
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+      }
       
     } catch (err) {
+      // If there's an error, clear the token and set not authenticated
+      localStorage.removeItem('token');
       setIsAuthenticated(false);
     } finally {
       setLoading(false);

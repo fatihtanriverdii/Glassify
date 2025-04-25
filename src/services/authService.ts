@@ -28,10 +28,7 @@ export const authService = {
   },
 
   async checkAuthStatus(): Promise<boolean> {
-    const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('token='))
-      ?.split('=')[1];
+    const token = localStorage.getItem('token');
 
     if (!token)
       return false;
@@ -42,9 +39,6 @@ export const authService = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if(response.status === 200)
-      return true;
-    else
-      return false;
+    return response.status === 200;
   },
 };

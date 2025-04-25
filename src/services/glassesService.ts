@@ -90,20 +90,29 @@ export const uploadGlasses = async (
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
+            credentials: 'include',
+            mode: 'cors',
             body: JSON.stringify(requestData)
         });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || 'Sunucu hatası oluştu');
+        }
 
         const data = await response.json();
         return {
             isSuccess: data.isSuccess,
-            message: data.message
+            message: data.message || 'Gözlük başarıyla yüklendi'
         };
     } catch (error) {
+        console.error('Gözlük yükleme hatası:', error);
         return {
             isSuccess: false,
-            message: 'Gözlük yükleme işlemi başarısız oldu.'
+            message: error instanceof Error ? error.message : 'Gözlük yükleme işlemi başarısız oldu'
         };
     }
 };
@@ -305,12 +314,16 @@ export const deleteGlasses = async (glassId: string): Promise<{ isSuccess: boole
 
         const decoded = jwtDecode(token) as DecodedToken;
 
-        const response = await fetch(`${API_URL}/User/delete/glasses/${glassId}?email=${decoded.email}`, {
+        const response = await fetch(`${API_URL}/User/remove/glasses`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({
+                glassesId: parseInt(glassId),
+                email: decoded.email
+            })
         });
 
         const data = await response.json();
