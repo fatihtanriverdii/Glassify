@@ -104,7 +104,8 @@ export const uploadGlasses = async (
 
 export const getSellerGlasses = async (): Promise<GetGlassesResponse> => {
     try {
-        const token = getCookie('token') as string;
+        console.log(document.cookie);
+        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] as string;
         console.log('Token:', token);
         const decoded = jwtDecode(token) as DecodedToken;
 
