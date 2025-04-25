@@ -55,7 +55,13 @@ export const uploadGlasses = async (
     }
 ): Promise<UploadGlassesResponse> => {
     try {
-        const token = getCookie('token') as string;
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        
+        if (!token) {
+            throw new Error('Token bulunamadı');
+        }
+
         const decoded = jwtDecode(token) as DecodedToken;
 
         const base64Image = await new Promise<string>((resolve, reject) => {
@@ -100,13 +106,17 @@ export const uploadGlasses = async (
             message: 'Gözlük yükleme işlemi başarısız oldu.'
         };
     }
-}
+};
 
 export const getSellerGlasses = async (): Promise<GetGlassesResponse> => {
     try {
-        console.log(document.cookie);
-        const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] as string;
-        console.log('Token:', token);
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        
+        if (!token) {
+            throw new Error('Token bulunamadı');
+        }
+
         const decoded = jwtDecode(token) as DecodedToken;
 
         const response = await fetch(`${API_URL}/User/glasses?email=${decoded.email}`, {
@@ -286,7 +296,13 @@ export const tryOnGlasses = async (faceImage: string, glassesImage: string, size
 
 export const deleteGlasses = async (glassId: string): Promise<{ isSuccess: boolean; message: string }> => {
     try {
-        const token = getCookie('token') as string;
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        
+        if (!token) {
+            throw new Error('Token bulunamadı');
+        }
+
         const decoded = jwtDecode(token) as DecodedToken;
 
         const response = await fetch(`${API_URL}/User/delete/glasses/${glassId}?email=${decoded.email}`, {

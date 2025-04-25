@@ -29,6 +29,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuthStatus = async () => {
     try {
+      // Check for token in localStorage first
+      const token = localStorage.getItem('token') || 
+        document.cookie
+          .split('; ')
+          .find(row => row.startsWith('token='))
+          ?.split('=')[1];
+
+      if (!token) {
+        setIsAuthenticated(false);
+        return;
+      }
+
       // Backend'den auth durumunu kontrol et
       const response = await authService.checkAuthStatus();
       setIsAuthenticated(response);
@@ -46,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await authService.login(credentials);
       if (response.isSuccess) {
+        // Store token in localStorage
+        localStorage.setItem('token', response.token);
         setIsAuthenticated(true);
         router.push('/seller');
       } else {
@@ -85,6 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
+      // Clear token from localStorage
+      localStorage.removeItem('token');
       setIsAuthenticated(false);
       router.push('/auth/login');
     }
