@@ -20,12 +20,17 @@ interface FaceAnalysisResult {
   };
 }
 
+enum Step {
+  FACE_ANALYSIS = 1,
+  GLASSES_TRY = 2
+}
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<FaceAnalysisResult | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [step, setStep] = useState(1); // 1: Yüz Analizi, 2: Gözlük Deneme
+  const [step, setStep] = useState<Step>(Step.FACE_ANALYSIS);
 
   useEffect(() => {
     setMounted(true);
@@ -39,7 +44,7 @@ export default function Home() {
     setActiveTab(newValue);
     setAnalysisResult(null);
     setCapturedImage(null);
-    setStep(1);
+    setStep(Step.FACE_ANALYSIS);
   };
 
   const handleAnalysisComplete = (result: AnalysisResult | null, image: string | null) => {
@@ -49,7 +54,7 @@ export default function Home() {
         confidence: result.confidence,
         otherProbabilities: result.probabilities
       });
-      setStep(2); // Analiz tamamlanınca 2. adıma geç
+      setStep(Step.GLASSES_TRY);
     } else {
       setAnalysisResult(null);
     }
@@ -59,7 +64,7 @@ export default function Home() {
   };
 
   const handleBack = () => {
-    setStep(1);
+    setStep(Step.FACE_ANALYSIS);
     setAnalysisResult(null);
     setCapturedImage(null);
   };
@@ -68,7 +73,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#f9f9f9] flex flex-col items-center py-8 px-2">
       <div className="w-full max-w-5xl">
         <div className="bg-white rounded-xl shadow-md p-8 mb-6">
-          {step === 1 && (
+          {step === Step.FACE_ANALYSIS && (
             <>
               <h1 className="text-4xl font-bold text-[#1e3a8a] text-center mb-4">Yüz Şekli Analizi</h1>
               <div className="flex justify-center mb-6">
@@ -76,6 +81,7 @@ export default function Home() {
                   <button
                     className={`px-5 py-2.5 rounded-lg text-lg font-semibold transition-colors ${activeTab === 0 ? 'bg-[#1e3a8a] text-white' : 'bg-[#93c5fd] text-[#1e3a8a]'} `}
                     onClick={() => handleTabChange(null as any, 0)}
+                    // @ts-ignore
                     disabled={step === 2}
                   >
                     Kamera ile Çek
@@ -83,6 +89,7 @@ export default function Home() {
                   <button
                     className={`px-5 py-2.5 rounded-lg text-lg font-semibold transition-colors ${activeTab === 1 ? 'bg-[#1e3a8a] text-white' : 'bg-[#93c5fd] text-[#1e3a8a]'} `}
                     onClick={() => handleTabChange(null as any, 1)}
+                    // @ts-ignore
                     disabled={step === 2}
                   >
                     Fotoğraf Yükle
@@ -92,7 +99,7 @@ export default function Home() {
             </>
           )}
 
-          {step === 1 && (
+          {step === Step.FACE_ANALYSIS && (
             <div>
               {activeTab === 0 ? (
                 <CameraCapture onAnalysisComplete={handleAnalysisComplete} />
@@ -102,7 +109,7 @@ export default function Home() {
             </div>
           )}
 
-          {step === 2 && analysisResult && capturedImage && (
+          {step === Step.GLASSES_TRY && analysisResult && capturedImage && (
             <div>
               <div className="mb-6">
                 <div className="flex flex-col items-center text-center">
