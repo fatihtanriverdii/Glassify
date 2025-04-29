@@ -25,7 +25,7 @@ export const FaceAnalysis: React.FC<{
   const [totalPages, setTotalPages] = useState<number>(1);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedGlassUrl, setSelectedGlassUrl] = useState<string | null>(null);
-  const [selectedGlassImage, setSelectedGlassImage] = useState<string | null>(null);
+  const [selectedGlassImage, setSelectedGlassImage] = useState<string | undefined>(undefined);
 
   const fetchGlasses = async (pageNumber: number) => {
     try {
