@@ -2,98 +2,90 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
-
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8 mt-8">
-      <div className="flex flex-col items-center mb-6">
-        <Image
-          src="/profile.jpg"
-          alt="Profil Fotoğrafı"
-          width={140}
-          height={180}
-          className="rounded-full border-2 border-blue-200 shadow mb-3"
-        />
-        <span className="text-xl font-bold text-[#1e3a8a] mt-2">Fatih Tanrıverdi</span>
-        <div className="flex gap-4 mt-2">
-          <a href="mailto:f_tanriverdi@hotmail.com" className="text-blue-700 hover:underline font-semibold flex items-center gap-1" target="_blank" rel="noopener noreferrer">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm2 4v1a3 3 0 01-3 3H7a3 3 0 01-3-3v-1" /></svg>
-            E-posta
-          </a>
-          <a href="https://www.linkedin.com/in/fatihtanrıverdii/" className="text-blue-700 hover:underline font-semibold flex items-center gap-1" target="_blank" rel="noopener noreferrer">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.841-1.563 3.04 0 3.602 2.002 3.602 4.604v5.592z"/></svg>
-            LinkedIn
-          </a>
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-[#1e3a8a] text-center mb-16">İletişim</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Sol Kart */}
+          <div className="bg-white rounded-3xl shadow-md p-10">
+            <div className="flex flex-col items-center">
+              <div className="w-48 h-48 relative mb-6">
+                <Image
+                  src="/profile.jpg"
+                  alt="Profil Fotoğrafı"
+                  fill
+                  className="rounded-full object-cover border-[6px] border-gray-50 shadow-lg"
+                />
+              </div>
+              <h2 className="text-2xl font-bold text-[#1e3a8a] mb-2">Fatih Tanrıverdi</h2>
+              <p className="text-gray-500 mb-10">Yazılım Geliştirici</p>
+
+              <div className="w-full space-y-8">
+                <a 
+                  href="mailto:f_tanriverdii@hotmail.com" 
+                  className="flex items-center space-x-4 text-gray-600 hover:text-[#1e3a8a] transition-colors group"
+                >
+                  <FaEnvelope className="text-xl text-[#1e3a8a] group-hover:scale-110 transition-transform" />
+                  <span>f_tanriverdii@hotmail.com</span>
+                </a>
+                
+                <div className="flex items-center space-x-4 text-gray-600">
+                  <FaPhone className="text-xl text-[#1e3a8a]" />
+                  <span>+90 (539) 814 63 29</span>
+                </div>
+                
+                <div className="flex items-center space-x-4 text-gray-600">
+                  <FaMapMarkerAlt className="text-xl text-[#1e3a8a]" />
+                  <span>İstanbul, Türkiye</span>
+                </div>
+              </div>
+
+              <div className="w-full mt-10 pt-10 border-t border-gray-100">
+                <h3 className="text-lg font-semibold text-[#1e3a8a] mb-6">Sosyal Medya</h3>
+                <div className="flex justify-start space-x-8">
+                  <a 
+                    href="https://www.linkedin.com/in/fatihtanrıverdii/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-gray-400 hover:text-[#1e3a8a] transition-all hover:scale-110"
+                  >
+                    <FaLinkedin className="text-2xl" />
+                  </a>
+                  <a 
+                    href="https://github.com/fatihtanriverdii" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-gray-400 hover:text-[#1e3a8a] transition-all hover:scale-110"
+                  >
+                    <FaGithub className="text-2xl" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sağ Kart - Harita */}
+          <div className="bg-white rounded-3xl shadow-md p-10">
+            <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6">Konum</h2>
+            <div className="w-full h-[500px] rounded-2xl overflow-hidden">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d385398.5897809314!2d28.731994399999998!3d41.0053215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa7040068086b%3A0xe1ccfe98bc01b0d0!2zxLBzdGFuYnVs!5e0!3m2!1str!2str!4v1641234567890!5m2!1str!2str"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
         </div>
       </div>
-      <h1 className="text-3xl font-bold text-[#1e3a8a] mb-4">İletişim</h1>
-      <p className="text-lg text-gray-700 mb-6">
-        Bizimle iletişime geçmek için aşağıdaki formu doldurabilir veya doğrudan e-posta gönderebilirsiniz.
-      </p>
-      <div className="mb-6">
-        <p className="text-gray-600">Email: info@glassify.com</p>
-        <p className="text-gray-600">Tel: +90 (555) 123 45 67</p>
-        <p className="text-gray-600">Adres: İstanbul, Türkiye</p>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1" htmlFor="name">Adınız</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1" htmlFor="email">E-posta</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1" htmlFor="message">Mesajınız</label>
-          <textarea
-            id="message"
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            required
-            rows={4}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-[#1e3a8a] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#2541a6] transition-colors"
-        >
-          Gönder
-        </button>
-        {submitted && (
-          <div className="text-green-600 font-semibold mt-2">Mesajınız iletildi! Teşekkürler.</div>
-        )}
-      </form>
     </div>
   );
-} 
+}

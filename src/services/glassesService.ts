@@ -52,7 +52,8 @@ export const uploadGlasses = async (
         heart: boolean;
         round: boolean;
         square: boolean;
-    }
+    },
+    link: string
 ): Promise<UploadGlassesResponse> => {
     try {
         const token = localStorage.getItem('token') || 
@@ -83,7 +84,8 @@ export const uploadGlasses = async (
             heart: faceShapes.heart,
             round: faceShapes.round,
             square: faceShapes.square,
-            email: decoded.email
+            email: decoded.email,
+            link: link
         };
 
         const response = await fetch(`${API_URL}/User/add/glasses`, {
@@ -337,5 +339,47 @@ export const deleteGlasses = async (glassId: string): Promise<{ isSuccess: boole
             isSuccess: false,
             message: 'Gözlük silinirken bir hata oluştu'
         };
+    }
+};
+
+export const detectFace = async (imageData: string): Promise<boolean> => {
+    try {
+        // Make sure models are loaded
+        await loadModels();
+
+        // Create an image element
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        
+        // Create a canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+            throw new Error('Canvas context oluşturulamadı');
+        }
+
+        // Load the image and set up canvas
+        await new Promise<void>((resolve, reject) => {
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                resolve();
+            };
+            img.onerror = () => reject(new Error('Fotoğraf yüklenemedi'));
+            img.src = imageData;
+        });
+
+        // Detect face with high confidence threshold
+        const result = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options({ 
+            minConfidence: 0.5 // Increase confidence threshold
+        }));
+
+        // Return true only if a face is detected with high confidence
+        return result !== null && result !== undefined && result.score > 0.5;
+    } catch (error) {
+        console.error('Yüz tespiti hatası:', error);
+        return false;
     }
 }; 

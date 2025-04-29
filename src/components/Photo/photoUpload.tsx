@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Button, Box, Paper, Typography, Stack, CircularProgress } from '@mui/material';
 import { Upload, Delete, CloudUpload } from '@mui/icons-material';
 import { useFaceShape } from '../../contexts/FaceShapeContext';
+import { detectFace } from '../../services/glassesService';
+import { useToast } from '@/components/ui/use-toast';
 
 interface AnalysisResult {
   shape: string;
@@ -19,19 +21,47 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { predictFaceShape } = useFaceShape();
+  const { toast } = useToast();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) handleFile(file);
   };
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setLoading(true);
+      try {
+        const reader = new FileReader();
+        const imageDataUrl = await new Promise<string>((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const hasFace = await detectFace(imageDataUrl);
+        if (!hasFace) {
+          toast({
+            title: "Yüz Bulunamadı",
+            description: "Yüklenen fotoğrafta yüz tespit edilemedi. Lütfen yüzünüzün görünür olduğu bir fotoğraf yükleyin.",
+            variant: "destructive",
+            duration: 3000,
+          });
+          return;
+        }
+        
+        setSelectedImage(imageDataUrl);
+      } catch (error) {
+        console.error('Yüz tespiti hatası:', error);
+        toast({
+          title: "Hata",
+          description: "Yüz tespiti sırasında bir hata oluştu. Lütfen tekrar deneyin.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

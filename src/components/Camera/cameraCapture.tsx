@@ -3,6 +3,8 @@ import Webcam from 'react-webcam';
 import { Button, Box, Paper, Typography, Alert, Stack, CircularProgress } from '@mui/material';
 import { Camera, Refresh, CameraAlt } from '@mui/icons-material';
 import { useFaceShape } from '../../contexts/FaceShapeContext';
+import { detectFace } from '../../services/glassesService';
+import { useToast } from '@/components/ui/use-toast';
 
 interface AnalysisResult {
   shape: string;
@@ -20,6 +22,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { predictFaceShape } = useFaceShape();
+  const { toast } = useToast();
 
   const videoConstraints = {
     width: 1280,
@@ -32,12 +35,35 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => 
     setError('Kamera erişimi sağlanamadı. Lütfen kamera izinlerini kontrol edin.');
   }, []);
 
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
-      setCapturedImage(imageSrc);
+      setLoading(true);
+      try {
+        const hasFace = await detectFace(imageSrc);
+        if (!hasFace) {
+          toast({
+            title: "Yüz Bulunamadı",
+            description: "Fotoğrafta yüz tespit edilemedi. Lütfen yüzünüzün görünür olduğundan emin olun.",
+            variant: "destructive",
+            duration: 3000,
+          });
+          return;
+        }
+        setCapturedImage(imageSrc);
+      } catch (error) {
+        console.error('Yüz tespiti hatası:', error);
+        toast({
+          title: "Hata",
+          description: "Yüz tespiti sırasında bir hata oluştu. Lütfen tekrar deneyin.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
     }
-  }, []);
+  }, [toast]);
 
   const handleAnalyze = async () => {
     if (!capturedImage) return;

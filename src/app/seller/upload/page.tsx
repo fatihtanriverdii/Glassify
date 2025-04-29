@@ -14,6 +14,7 @@ const UploadGlassesPage = () => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string>('');
     const [glassesType, setGlassesType] = useState<GlassesType | ''>('');
+    const [link, setLink] = useState<string>('');
     const [faceShapes, setFaceShapes] = useState({
         oval: false,
         oblong: false,
@@ -79,10 +80,10 @@ const UploadGlassesPage = () => {
     };
 
     const handleSubmit = async () => {
-        if (!selectedImage || !glassesType) {
+        if (!selectedImage || !glassesType || !link) {
             toast({
                 title: 'Hata',
-                description: 'Lütfen bir fotoğraf seçin ve gözlük tipini belirleyin.',
+                description: 'Lütfen bir fotoğraf seçin, gözlük tipini belirleyin ve link girin.',
                 variant: 'destructive'
             });
             return;
@@ -100,7 +101,7 @@ const UploadGlassesPage = () => {
 
         setIsLoading(true);
         try {
-            const response = await uploadGlasses(selectedImage, glassesType as GlassesType, faceShapes);
+            const response = await uploadGlasses(selectedImage, glassesType as GlassesType, faceShapes, link);
             toast({
                 title: response.isSuccess ? 'Başarılı' : 'Hata',
                 description: response.message,
@@ -111,6 +112,7 @@ const UploadGlassesPage = () => {
                 setSelectedImage(null);
                 setImagePreview('');
                 setGlassesType('');
+                setLink('');
                 setFaceShapes({
                     oval: false,
                     oblong: false,
@@ -247,6 +249,19 @@ const UploadGlassesPage = () => {
                                 <SelectItem value="Oval">Oval</SelectItem>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">
+                            Link
+                        </label>
+                        <input
+                            type="text"
+                            value={link}
+                            onChange={(e) => setLink(e.target.value)}
+                            placeholder="Gözlük satış linkini girin"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
                     </div>
 
                     <div className="space-y-2">
