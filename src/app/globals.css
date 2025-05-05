@@ -83,8 +83,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -92,4 +90,42 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom Scrollbar for modal and app */
+.custom-scrollbar,
+.custom-scrollbar * {
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f4f4f5;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  background: #f4f4f5;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a3a3a3;
+}
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: #f4f4f5;
+}
+
+.dark .custom-scrollbar,
+.dark .custom-scrollbar * {
+  scrollbar-color: #444 #18181b;
+}
+.dark .custom-scrollbar::-webkit-scrollbar {
+  background: #18181b;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #444;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-corner {
+  background: #18181b;
 } 

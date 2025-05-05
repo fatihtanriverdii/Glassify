@@ -19,12 +19,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr">
+    <html lang="tr" suppressHydrationWarning className="dark">
       <body className={inter.className}>
         <Providers>
-          <div className="min-h-[calc(100vh+20rem)] flex flex-col bg-gradient-to-br from-gray-50 to-blue-50">
+          <div className="min-h-[calc(100vh+20rem)] flex flex-col bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
             <Header />
-            <main className="flex-grow pt-6">
+            <main className="flex-grow">
               {children}
             </main>
             <Footer />

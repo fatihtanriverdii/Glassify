@@ -93,17 +93,17 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType 
 
   return (
     <div className="w-full mt-8">
-      <h2 className="text-xl font-semibold mb-4 text-center text-gray-800">
+      <h2 className="text-xl font-semibold mb-4 text-center text-gray-800 dark:text-blue-300">
         Tüm Gözlükler
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl">
         {glasses.map((glass, index) => {
           const isLastElement = index === glasses.length - 1;
           return (
             <div
               key={`${glass.id}-${index}`}
               ref={isLastElement ? lastGlassElementRef : null}
-              className="flex flex-col items-center bg-white rounded-xl shadow-md p-4 border border-gray-200 hover:border-blue-500 transition-all duration-200 cursor-pointer"
+              className="flex flex-col items-center bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 cursor-pointer"
               onClick={() => handleGlassSelect(glass)}
             >
               <div className="w-full h-32 relative mb-2">
@@ -113,7 +113,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType 
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-sm font-medium text-gray-700">{glass.glassesType}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-100">{glass.glassesType}</span>
             </div>
           );
         })}
@@ -124,7 +124,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType 
         </div>
       )}
       {!hasMore && glasses.length > 0 && (
-        <p className="text-center text-gray-500 py-4">Tüm gözlükler yüklendi</p>
+        <p className="text-center text-gray-500 dark:text-gray-300 py-4">Tüm gözlükler yüklendi</p>
       )}
       {showDetails && (
         <GlassesDetails

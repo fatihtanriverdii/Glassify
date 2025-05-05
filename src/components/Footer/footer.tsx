@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white mt-auto">
+    <footer className="bg-gray-900 dark:bg-gray-950 text-white mt-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Company Info */}
@@ -42,14 +42,14 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-2">İletişim</h3>
             <ul className="space-y-1 text-sm text-gray-400">
               <li>Email: info@glassify.com</li>
-              <li>Tel: +90 (555) 123 45 67</li>
+              <li>Tel: +90 (539) 814 63 29</li>
               <li>Adres: İstanbul, Türkiye</li>
             </ul>
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-800 mt-4 pt-4 text-center text-gray-400 text-sm">
+        <div className="mt-6 pt-6 border-t border-gray-800 text-center text-sm text-gray-400">
           <p>&copy; {new Date().getFullYear()} Glassify. Tüm hakları saklıdır.</p>
         </div>
       </div>

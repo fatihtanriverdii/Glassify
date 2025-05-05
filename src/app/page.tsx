@@ -70,15 +70,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 flex flex-col items-center py-12 px-4">
+    <div className="min-h-screen bg-background flex flex-col items-center py-12 px-4">
       <div className="w-full max-w-6xl">
         {/* Hero Section - Only show during face analysis step */}
         {step === Step.FACE_ANALYSIS && (
           <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-[#1e3a8a] mb-6">
-              Mükemmel Gözlüğünüzü <span className="text-blue-600">Glassify</span> ile Bulun
+            <h1 className="text-5xl font-bold text-[#1e3a8a] dark:text-blue-300 mb-6">
+              Mükemmel Gözlüğünüzü <span className="bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-400 bg-clip-text text-transparent tracking-tight">Glassify</span> ile Bulun
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Yapay zeka destekli yüz analizi ile size en uygun gözlük modellerini keşfedin.
               Sadece bir fotoğraf ile başlayın.
             </p>
@@ -86,17 +86,17 @@ export default function Home() {
         )}
 
         {/* Main Camera Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-16">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-16">
           {step === Step.FACE_ANALYSIS && (
             <>
-              <h2 className="text-3xl font-bold text-[#1e3a8a] text-center mb-8">Yüz Şekli Analizi</h2>
+              <h2 className="text-3xl font-bold text-[#1e3a8a] dark:text-blue-300 text-center mb-8">Yüz Şekli Analizi</h2>
               <div className="flex justify-center mb-8">
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto px-4 sm:px-0">
                   <button
                     className={`px-4 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all duration-300 ${
                       activeTab === 0 
-                        ? 'bg-[#1e3a8a] text-white shadow-lg' 
-                        : 'bg-[#93c5fd] text-[#1e3a8a] hover:bg-[#60a5fa]'
+                        ? 'bg-[#1e3a8a] text-white shadow-lg dark:bg-blue-500 dark:text-gray-900' 
+                        : 'bg-[#93c5fd] text-[#1e3a8a] hover:bg-[#60a5fa] dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300'
                     }`}
                     onClick={() => handleTabChange(null as any, 0)}
                     disabled={Number(step) === Step.GLASSES_TRY}
@@ -112,8 +112,8 @@ export default function Home() {
                   <button
                     className={`px-4 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all duration-300 ${
                       activeTab === 1 
-                        ? 'bg-[#1e3a8a] text-white shadow-lg' 
-                        : 'bg-[#93c5fd] text-[#1e3a8a] hover:bg-[#60a5fa]'
+                        ? 'bg-[#1e3a8a] text-white shadow-lg dark:bg-blue-500 dark:text-gray-900' 
+                        : 'bg-[#93c5fd] text-[#1e3a8a] hover:bg-[#60a5fa] dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300'
                     }`}
                     onClick={() => handleTabChange(null as any, 1)}
                     disabled={Number(step) === Step.GLASSES_TRY}
@@ -144,7 +144,7 @@ export default function Home() {
             <div>
               <div className="flex items-center mb-6">
                 <button
-                  className="px-4 py-2 rounded-lg bg-white text-[#1e3a8a] text-base font-semibold shadow-sm border border-[#1e3a8a] hover:bg-[#f8fafc] transition-colors flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-[#1e3a8a] dark:text-blue-300 text-base font-semibold shadow-sm border border-[#1e3a8a] dark:border-blue-300 hover:bg-[#f8fafc] dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
                   onClick={handleBack}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -155,8 +155,8 @@ export default function Home() {
               </div>
               <div className="mb-6">
                 <div className="flex flex-col items-center text-center">
-                  <span className="text-xl font-semibold text-[#111827]">Yüz Şekli: {analysisResult.faceType}</span>
-                  <span className="text-lg text-gray-500">Güven Skoru: %{Math.min(100, (analysisResult.confidence)).toFixed(0)}</span>
+                  <span className="text-xl font-semibold text-[#111827] dark:text-gray-100">Yüz Şekli: {analysisResult.faceType}</span>
+                  <span className="text-lg text-gray-500 dark:text-gray-300">Güven Skoru: %{Math.min(100, (analysisResult.confidence)).toFixed(0)}</span>
                 </div>
               </div>
               <FaceAnalysis
@@ -172,71 +172,71 @@ export default function Home() {
           <>
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-              <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
                 <div className="text-[#1e3a8a] mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Hassas Yüz Analizi</h3>
-                <p className="text-gray-600">Yapay zeka teknolojimiz yüz şeklinizi analiz ederek size en uygun gözlük stilini belirler.</p>
+                <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Hassas Yüz Analizi</h3>
+                <p className="text-gray-600 dark:text-gray-300">Yapay zeka teknolojimiz yüz şeklinizi analiz ederek size en uygun gözlük stilini belirler.</p>
               </div>
 
-              <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
                 <div className="text-[#1e3a8a] mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Kolay Kullanım</h3>
-                <p className="text-gray-600">Fotoğraf yükleyin veya kameranızı kullanın - sadece birkaç saniye içinde sonuçları görün.</p>
+                <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Kolay Kullanım</h3>
+                <p className="text-gray-600 dark:text-gray-300">Fotoğraf yükleyin veya kameranızı kullanın - sadece birkaç saniye içinde sonuçları görün.</p>
               </div>
 
-              <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
                 <div className="text-[#1e3a8a] mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Kişiselleştirilmiş Öneriler</h3>
-                <p className="text-gray-600">Size özel gözlük önerileri ile tarzınıza en uygun seçenekleri keşfedin.</p>
+                <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Kişiselleştirilmiş Öneriler</h3>
+                <p className="text-gray-600 dark:text-gray-300">Size özel gözlük önerileri ile tarzınıza en uygun seçenekleri keşfedin.</p>
               </div>
 
-              <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
                 <div className="text-[#1e3a8a] mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Hızlı Sonuç</h3>
-                <p className="text-gray-600">Saniyeler içinde yüz şeklinize uygun gözlük önerilerini alın.</p>
+                <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Hızlı Sonuç</h3>
+                <p className="text-gray-600 dark:text-gray-300">Saniyeler içinde yüz şeklinize uygun gözlük önerilerini alın.</p>
               </div>
             </div>
 
             {/* How It Works */}
-            <div className="bg-white rounded-2xl shadow-lg p-12 mb-16">
-              <h2 className="text-3xl font-bold text-[#1e3a8a] text-center mb-12">Nasıl Çalışır?</h2>
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-12 mb-16">
+              <h2 className="text-3xl font-bold text-[#1e3a8a] dark:text-blue-300 text-center mb-12">Nasıl Çalışır?</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 bg-[#1e3a8a] text-white rounded-full flex items-center justify-center text-2xl font-bold mb-6">
                     1
                   </div>
                   <h3 className="text-xl font-semibold mb-4">Fotoğraf Çekin veya Yükleyin</h3>
-                  <p className="text-gray-600">Kameranızı kullanın veya mevcut bir fotoğrafınızı yükleyin.</p>
+                  <p className="text-gray-600 dark:text-gray-300">Kameranızı kullanın veya mevcut bir fotoğrafınızı yükleyin.</p>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 bg-[#1e3a8a] text-white rounded-full flex items-center justify-center text-2xl font-bold mb-6">
                     2
                   </div>
                   <h3 className="text-xl font-semibold mb-4">Yapay Zeka Analiz Eder</h3>
-                  <p className="text-gray-600">Gelişmiş yapay zeka teknolojimiz yüz şeklinizi analiz eder.</p>
+                  <p className="text-gray-600 dark:text-gray-300">Gelişmiş yapay zeka teknolojimiz yüz şeklinizi analiz eder.</p>
                 </div>
                 <div className="flex flex-col items-center text-center">
                   <div className="w-20 h-20 bg-[#1e3a8a] text-white rounded-full flex items-center justify-center text-2xl font-bold mb-6">
                     3
                   </div>
                   <h3 className="text-xl font-semibold mb-4">Önerileri Görün</h3>
-                  <p className="text-gray-600">Size özel gözlük önerilerini keşfedin ve deneyin.</p>
+                  <p className="text-gray-600 dark:text-gray-300">Size özel gözlük önerilerini keşfedin ve deneyin.</p>
                 </div>
               </div>
             </div>
