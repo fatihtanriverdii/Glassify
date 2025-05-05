@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { tryOnGlasses } from '@/services/glassesService';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -26,9 +26,12 @@ export const FaceAnalysis: React.FC<{
   const [showDetails, setShowDetails] = useState(false);
   const [selectedGlassUrl, setSelectedGlassUrl] = useState<string | null>(null);
   const [selectedGlassImage, setSelectedGlassImage] = useState<string | undefined>(undefined);
+  const [galleryLoading, setGalleryLoading] = useState<boolean>(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchGlasses = async (pageNumber: number) => {
     try {
+      setGalleryLoading(true);
       const response = await fetch(`${API_URL}/Glasses/suitable/glasses?FaceType=${analysisResult.faceType}&pageNumber=${pageNumber}&pageSize=5`, {
         headers: {
           'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}`,
@@ -56,6 +59,8 @@ export const FaceAnalysis: React.FC<{
       setTotalPages(1);
       console.error('Gözlük getirme hatası:', error);
       throw error;
+    } finally {
+      setGalleryLoading(false);
     }
   };
 
@@ -106,6 +111,7 @@ export const FaceAnalysis: React.FC<{
 
   const handleNextGlass = async () => {
     try {
+      setGalleryLoading(true);
       setCurrentPage(prev => prev + 1);
       await fetchGlasses(currentPage + 1);
     } catch (error) {
@@ -115,12 +121,15 @@ export const FaceAnalysis: React.FC<{
         variant: 'destructive',
         duration: 2000
       });
+    } finally {
+      setGalleryLoading(false);
     }
   };
 
   const handlePrevGlass = async () => {
     if (currentPage > 1) {
       try {
+        setGalleryLoading(true);
         setCurrentPage(prev => prev - 1);
         await fetchGlasses(currentPage - 1);
       } catch (error) {
@@ -130,6 +139,8 @@ export const FaceAnalysis: React.FC<{
           variant: 'destructive',
           duration: 2000
         });
+      } finally {
+        setGalleryLoading(false);
       }
     }
   };
@@ -147,25 +158,51 @@ export const FaceAnalysis: React.FC<{
 
   useEffect(() => {
     if (analysisResult.faceType) {
+      setGalleryLoading(true);
       fetchGlasses(currentPage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analysisResult.faceType, currentPage]);
 
+  useEffect(() => {
+    if (!processedImage) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      tryOnGlassesHandler();
+    }, 400);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [sizeMultiplier]);
+
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
-      <div className="w-full bg-white rounded-xl shadow-md p-6 mt-2">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-2 border border-gray-100 dark:border-gray-700">
         <div className="text-center mb-4">
-          <h1 className="text-2xl font-bold text-[#1e3a8a]">Size Özel Gözlük Önerileri</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-[#1e3a8a] dark:text-blue-300">Size Özel Gözlük Önerileri</h1>
+          <p className="text-gray-500 dark:text-gray-200 text-sm mt-1">
             {analysisResult.faceType} yüz şeklinize en uygun gözlükler
           </p>
         </div>
         {/* Gözlükler Galerisi + Pagination */}
         <div className="w-full flex flex-col items-center mb-6 min-h-[180px]">
-          {glasses.length === 0 ? (
-            <div className="flex items-center justify-center w-full h-32 text-gray-400 text-lg">
-              Yükleniyor...
+          {galleryLoading || glasses.length === 0 ? (
+            <div className="flex flex-row gap-4 overflow-x-auto overflow-y-hidden w-full flex-nowrap min-w-0 px-2 justify-center">
+              {[...Array(5)].map((_, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col items-center shadow-md p-4 bg-gray-100 dark:bg-gray-900 min-w-[140px] rounded-xl border border-gray-200 dark:border-gray-800 h-[200px] justify-between animate-pulse"
+                >
+                  <div className="flex flex-col items-center w-full">
+                    <div className="w-24 h-16 bg-gray-300 dark:bg-gray-700 rounded mb-2" />
+                    <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded" />
+                  </div>
+                  <div className="flex flex-col w-full gap-2 mt-4">
+                    <div className="h-10 w-full bg-gray-300 dark:bg-gray-700 rounded-lg" />
+                    <div className="h-8 w-full bg-gray-200 dark:bg-gray-800 rounded-lg" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <>
@@ -176,16 +213,16 @@ export const FaceAnalysis: React.FC<{
                   size="icon"
                   onClick={handlePrevGlass}
                   disabled={currentPage === 1}
-                  className="!w-12 !h-12"
+                  className="!w-12 !h-12 flex-shrink-0"
                 >
                   <ChevronLeft className="h-7 w-7" />
                 </Button>
-                <div className="flex flex-row gap-4 overflow-x-auto overflow-y-hidden w-full flex-nowrap min-w-0 px-2">
+                <div className="flex flex-row gap-4 overflow-x-auto overflow-y-hidden flex-1 min-w-0 px-2 justify-center">
                   {glasses.map((glass, idx) => (
                     <div
                       key={glass.id}
-                      className={`flex flex-col items-center shadow-md p-4 bg-white min-w-[140px] rounded-xl transition-all duration-150 cursor-pointer h-[200px] justify-between ${
-                        selectedGlassIndex === idx ? 'border-2 border-[#1e3a8a]' : 'border border-gray-200'
+                      className={`flex flex-col items-center shadow-md p-4 bg-white dark:bg-gray-900 min-w-[140px] rounded-xl transition-all duration-150 cursor-pointer h-[200px] justify-between ${
+                        selectedGlassIndex === idx ? 'border-2 border-[#1e3a8a] dark:border-blue-400' : 'border border-gray-200 dark:border-gray-800'
                       }`}
                       onClick={() => handleGlassSelect(glass)}
                     >
@@ -195,7 +232,7 @@ export const FaceAnalysis: React.FC<{
                           alt={`Gözlük ${idx + 1}`}
                           className="w-24 h-16 object-contain mb-2"
                         />
-                        <span className="text-sm font-medium text-gray-600">{glass.glassesType}</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-100">{glass.glassesType}</span>
                       </div>
                       <div className="flex flex-col w-full gap-2">
                         {selectedGlassIndex === idx ? (
@@ -206,7 +243,7 @@ export const FaceAnalysis: React.FC<{
                                 tryOnGlassesHandler();
                               }}
                               disabled={loading}
-                              className="w-full h-10 text-base rounded-lg bg-[#1e3a8a] hover:bg-[#2541a6] transition-colors shadow text-white font-bold"
+                              className="w-full h-10 text-base rounded-lg bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 shadow font-bold border-0"
                               variant="default"
                             >
                               {loading ? (
@@ -222,7 +259,7 @@ export const FaceAnalysis: React.FC<{
                             <Button
                               onClick={(e) => handleViewDetails(glass, e)}
                               variant="outline"
-                              className="w-full h-8 text-sm"
+                              className="w-full h-8 text-sm border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white transition-colors"
                             >
                               Detayları Gör
                             </Button>
@@ -230,7 +267,7 @@ export const FaceAnalysis: React.FC<{
                         ) : (
                           <Button
                             variant="ghost"
-                            className="w-full h-10 text-sm text-gray-500 hover:text-[#1e3a8a]"
+                            className="w-full h-10 text-sm text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400"
                           >
                             Seç
                           </Button>
@@ -244,7 +281,7 @@ export const FaceAnalysis: React.FC<{
                   size="icon"
                   onClick={handleNextGlass}
                   disabled={currentPage === totalPages}
-                  className="!w-12 !h-12"
+                  className="!w-12 !h-12 flex-shrink-0"
                 >
                   <ChevronRight className="h-7 w-7" />
                 </Button>
@@ -255,8 +292,8 @@ export const FaceAnalysis: React.FC<{
                   {glasses.map((glass, idx) => (
                     <div
                       key={glass.id}
-                      className={`flex flex-col items-center shadow-md p-2 bg-white min-w-[110px] rounded-xl transition-all duration-150 cursor-pointer h-[180px] justify-between ${
-                        selectedGlassIndex === idx ? 'border-2 border-[#1e3a8a]' : 'border border-gray-200'
+                      className={`flex flex-col items-center shadow-md p-2 bg-white dark:bg-gray-900 min-w-[110px] rounded-xl transition-all duration-150 cursor-pointer h-[180px] justify-between ${
+                        selectedGlassIndex === idx ? 'border-2 border-[#1e3a8a] dark:border-blue-400' : 'border border-gray-200 dark:border-gray-800'
                       }`}
                       onClick={() => handleGlassSelect(glass)}
                     >
@@ -266,7 +303,7 @@ export const FaceAnalysis: React.FC<{
                           alt={`Gözlük ${idx + 1}`}
                           className="w-20 h-14 object-contain mb-2"
                         />
-                        <span className="text-sm font-medium text-gray-600">{glass.glassesType}</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-100">{glass.glassesType}</span>
                       </div>
                       <div className="flex flex-col w-full gap-2">
                         {selectedGlassIndex === idx ? (
@@ -277,7 +314,7 @@ export const FaceAnalysis: React.FC<{
                                 tryOnGlassesHandler();
                               }}
                               disabled={loading}
-                              className="w-full h-9 text-sm rounded-lg bg-[#1e3a8a] hover:bg-[#2541a6] transition-colors shadow text-white font-bold"
+                              className="w-full h-9 text-sm rounded-lg bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 shadow font-bold border-0"
                               variant="default"
                             >
                               {loading ? (
@@ -293,7 +330,7 @@ export const FaceAnalysis: React.FC<{
                             <Button
                               onClick={(e) => handleViewDetails(glass, e)}
                               variant="outline"
-                              className="w-full h-7 text-xs"
+                              className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white transition-colors"
                             >
                               Detayları Gör
                             </Button>
@@ -301,7 +338,7 @@ export const FaceAnalysis: React.FC<{
                         ) : (
                           <Button
                             variant="ghost"
-                            className="w-full h-9 text-xs text-gray-500 hover:text-[#1e3a8a]"
+                            className="w-full h-9 text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400"
                           >
                             Seç
                           </Button>
@@ -340,7 +377,7 @@ export const FaceAnalysis: React.FC<{
             <img
               src={capturedImage}
               alt="Analiz edilen fotoğraf"
-              className="w-full rounded-lg border border-gray-200 shadow-sm"
+              className="w-full rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900"
             />
           </div>
           <div className="relative">
@@ -348,17 +385,17 @@ export const FaceAnalysis: React.FC<{
               <img
                 src={processedImage}
                 alt="Gözlük deneme sonucu"
-                className="w-full rounded-lg border border-gray-200 shadow-sm"
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 text-gray-400 text-sm">Gözlük deneme sonucu burada görünecek</div>
+              <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-300 text-sm">Gözlük deneme sonucu burada görünecek</div>
             )}
           </div>
         </div>
         {/* Slider - kutu içinde, ortalanmış ve modern */}
         <div className="w-full flex justify-center mt-6">
-          <div className="bg-[#f9f9f9] rounded-xl shadow p-4 max-w-md w-full flex flex-col items-center">
-            <label htmlFor="size-slider" className="block text-base font-semibold text-[#1e3a8a] mb-2">
+          <div className="bg-[#f9f9f9] dark:bg-gray-900 rounded-xl shadow-lg p-4 max-w-md w-full flex flex-col items-center border border-gray-100 dark:border-gray-800">
+            <label htmlFor="size-slider" className="block text-base font-semibold text-[#1e3a8a] dark:text-blue-300 mb-2">
               Gözlük Boyutu
             </label>
             <input
@@ -370,17 +407,14 @@ export const FaceAnalysis: React.FC<{
               value={sizeMultiplier}
               onChange={(e) => {
                 setSizeMultiplier(parseFloat(e.target.value));
-                if (processedImage) {
-                  tryOnGlassesHandler();
-                }
               }}
-              className="w-full h-2 bg-[#93c5fd] rounded-lg appearance-none cursor-pointer accent-[#1e3a8a]"
+              className="w-full h-2 bg-[#93c5fd] dark:bg-blue-900 rounded-lg appearance-none cursor-pointer accent-[#1e3a8a] dark:accent-blue-400"
             />
-            <div className="flex justify-between w-full text-xs text-gray-400 mt-1">
+            <div className="flex justify-between w-full text-xs text-gray-400 dark:text-gray-300 mt-1">
               <span>Küçük</span>
               <span>Büyük</span>
             </div>
-            <div className="text-xs text-gray-400 mt-1 text-center">Boyut ayarını yaparak yüzünüze en uygun şekilde deneyin.</div>
+            <div className="text-xs text-gray-400 dark:text-gray-300 mt-1 text-center">Boyut ayarını yaparak yüzünüze en uygun şekilde deneyin.</div>
           </div>
         </div>
         {/* Hata mesajı */}

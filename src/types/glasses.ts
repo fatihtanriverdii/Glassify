@@ -3,4 +3,5 @@ export interface Glass {
   image: string;
   link: string;
   glassesType: string;
+  brand: string;
 } 
