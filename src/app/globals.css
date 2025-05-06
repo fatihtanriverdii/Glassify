@@ -81,12 +81,11 @@
     @apply bg-gray-50;
     min-height: 100vh;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -129,3 +128,15 @@
 .dark .custom-scrollbar::-webkit-scrollbar-corner {
   background: #18181b;
 } 
+
+.favorites-transition {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.favorites-transition.open {
+  max-height: 1000px; /* İçeriğe göre artırabilirsin */
+  opacity: 1;
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { tryOnGlasses } from '@/services/glassesService';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import { Glass } from '@/types/glasses';
 import { AnalysisResult } from '@/types/analysis';
 import GlassesDetails from './GlassesDetails';
@@ -21,6 +21,19 @@ export const FaceAnalysis: React.FC<{
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [glasses, setGlasses] = useState<Glass[]>([]);
   const [selectedGlassIndex, setSelectedGlassIndex] = useState<number>(0);
+  const [favoriteGlasses, setFavoriteGlasses] = useState<Glass[]>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('favoriteGlasses');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch {
+          return [];
+        }
+      }
+    }
+    return [];
+  });
   const { toast } = useToast();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [showDetails, setShowDetails] = useState(false);
@@ -28,6 +41,8 @@ export const FaceAnalysis: React.FC<{
   const [selectedGlassImage, setSelectedGlassImage] = useState<string | undefined>(undefined);
   const [galleryLoading, setGalleryLoading] = useState<boolean>(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [lastFavoriteAction, setLastFavoriteAction] = useState<{type: 'add' | 'remove', glass: Glass} | null>(null);
 
   const fetchGlasses = async (pageNumber: number) => {
     try {
@@ -156,6 +171,22 @@ export const FaceAnalysis: React.FC<{
     setShowDetails(true);
   };
 
+  const toggleFavorite = (glass: Glass, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavoriteGlasses(prev => {
+      const isFavorite = prev.some(g => g.id === glass.id);
+      if (isFavorite) {
+        setLastFavoriteAction({ type: 'remove', glass });
+        return prev.filter(g => g.id !== glass.id);
+      } else {
+        setLastFavoriteAction({ type: 'add', glass });
+        return [...prev.filter(g => g.id !== glass.id), glass];
+      }
+    });
+  };
+
+  const isFavorite = (glass: Glass) => favoriteGlasses.some(g => g.id === glass.id);
+
   useEffect(() => {
     if (analysisResult.faceType) {
       setGalleryLoading(true);
@@ -174,6 +205,28 @@ export const FaceAnalysis: React.FC<{
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [sizeMultiplier]);
+
+  useEffect(() => {
+    localStorage.setItem('favoriteGlasses', JSON.stringify(favoriteGlasses));
+  }, [favoriteGlasses]);
+
+  useEffect(() => {
+    if (!lastFavoriteAction) return;
+    if (lastFavoriteAction.type === 'add') {
+      toast({
+        title: 'Favorilere Eklendi',
+        description: 'Gözlük favorilerinize eklendi',
+        duration: 2000
+      });
+    } else if (lastFavoriteAction.type === 'remove') {
+      toast({
+        title: 'Favorilerden Çıkarıldı',
+        description: 'Gözlük favorilerinizden çıkarıldı',
+        duration: 2000
+      });
+    }
+    setLastFavoriteAction(null);
+  }, [lastFavoriteAction, toast]);
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
@@ -226,7 +279,21 @@ export const FaceAnalysis: React.FC<{
                       }`}
                       onClick={() => handleGlassSelect(glass)}
                     >
-                      <div className="flex flex-col items-center">
+                      <div className="flex flex-col items-center w-full">
+                        <div className="relative w-full flex justify-end">
+                          <button
+                            onClick={(e) => toggleFavorite(glass, e)}
+                            className="absolute -top-2 -right-2 p-1 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
+                          >
+                            <Heart
+                              className={`w-5 h-5 ${
+                                isFavorite(glass)
+                                  ? 'fill-red-500 text-red-500'
+                                  : 'text-gray-400 hover:text-red-500'
+                              }`}
+                            />
+                          </button>
+                        </div>
                         <img
                           src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
                           alt={`Gözlük ${idx + 1}`}
@@ -298,6 +365,20 @@ export const FaceAnalysis: React.FC<{
                       onClick={() => handleGlassSelect(glass)}
                     >
                       <div className="flex flex-col items-center">
+                        <div className="relative w-full flex justify-end">
+                          <button
+                            onClick={(e) => toggleFavorite(glass, e)}
+                            className="absolute -top-2 -right-2 p-1 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
+                          >
+                            <Heart
+                              className={`w-5 h-5 ${
+                                isFavorite(glass)
+                                  ? 'fill-red-500 text-red-500'
+                                  : 'text-gray-400 hover:text-red-500'
+                              }`}
+                            />
+                          </button>
+                        </div>
                         <img
                           src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
                           alt={`Gözlük ${idx + 1}`}
@@ -434,7 +515,14 @@ export const FaceAnalysis: React.FC<{
       </div>
 
       {/* Add AllGlassesList component below the existing content */}
-      <AllGlassesList initialFaceType={analysisResult.faceType} />
+      <AllGlassesList 
+        initialFaceType={analysisResult.faceType} 
+        capturedImage={capturedImage} 
+        sizeMultiplier={sizeMultiplier}
+        favoriteGlasses={favoriteGlasses}
+        toggleFavorite={toggleFavorite}
+        isFavorite={isFavorite}
+      />
     </div>
   );
 }; 
