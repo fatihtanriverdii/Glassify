@@ -81,9 +81,11 @@ const GlassesDetails: React.FC<GlassesDetailsProps> = ({ isOpen, onClose, glassU
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Ürün Detayları</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-lg text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 focus:outline-none p-3 rounded-full transition-colors duration-200 flex items-center justify-center group"
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
+              aria-label="Kapat"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-7 h-7 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
