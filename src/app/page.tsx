@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Container, Box, Typography, Paper, Tabs, Tab } from '@mui/material';
 import CameraCapture from '@/components/Camera/cameraCapture';
 import PhotoUpload from '@/components/Photo/photoUpload';
@@ -31,10 +31,18 @@ export default function Home() {
   const [analysisResult, setAnalysisResult] = useState<FaceAnalysisResult | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [step, setStep] = useState<Step>(Step.FACE_ANALYSIS);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (step === Step.GLASSES_TRY && resultRef.current) {
+      const y = resultRef.current.getBoundingClientRect().top + window.pageYOffset - 60; // 60px yukarı offset
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }, [step]);
 
   if (!mounted) {
     return null;
@@ -153,7 +161,7 @@ export default function Home() {
                   Geri
                 </button>
               </div>
-              <div className="mb-6">
+              <div className="mb-6" ref={resultRef}>
                 <div className="flex flex-col items-center text-center">
                   <span className="text-xl font-semibold text-[#111827] dark:text-gray-100">Yüz Şekli: {analysisResult.faceType}</span>
                   <span className="text-lg text-gray-500 dark:text-gray-300">Güven Skoru: %{Math.min(100, (analysisResult.confidence)).toFixed(0)}</span>
