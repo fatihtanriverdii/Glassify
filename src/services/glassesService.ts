@@ -53,7 +53,8 @@ export const uploadGlasses = async (
         round: boolean;
         square: boolean;
     },
-    link: string
+    link: string,
+    isRecycling: boolean
 ): Promise<UploadGlassesResponse> => {
     try {
         const token = localStorage.getItem('token') || 
@@ -85,7 +86,8 @@ export const uploadGlasses = async (
             round: faceShapes.round,
             square: faceShapes.square,
             email: decoded.email,
-            link: link
+            link: link,
+            isRecycling: isRecycling
         };
 
         const response = await fetch(`${API_URL}/User/add/glasses`, {

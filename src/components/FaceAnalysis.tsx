@@ -274,34 +274,51 @@ export const FaceAnalysis: React.FC<{
                   {glasses.map((glass, idx) => (
                     <div
                       key={glass.id}
-                      className={`flex flex-col items-center shadow-md p-4 bg-white dark:bg-gray-900 min-w-[140px] rounded-xl transition-all duration-150 cursor-pointer h-[200px] justify-between ${
-                        selectedGlassIndex === idx ? 'border-2 border-[#1e3a8a] dark:border-blue-400' : 'border border-gray-200 dark:border-gray-800'
-                      }`}
+                      className={`flex flex-col items-center shadow-sm p-4 min-w-[140px] rounded-2xl transition-all duration-150 cursor-pointer h-[200px] justify-between
+                        ${glass.isRecycling
+                          ? selectedGlassIndex === idx
+                            ? 'border-2 border-green-600 dark:border-green-400'
+                            : 'border border-green-500 dark:border-green-400'
+                          : selectedGlassIndex === idx
+                            ? 'border-2 border-[#1e3a8a] dark:border-blue-400'
+                            : 'border border-gray-200 dark:border-gray-800'}
+                        bg-white dark:bg-gray-900 relative`}
                       onClick={() => handleGlassSelect(glass)}
                     >
+                      {/* Simetrik üst ikonlar */}
+                      <div className="absolute top-2.5 left-1 right-1 flex flex-row justify-between w-[calc(100%-8px)] z-20">
+                        {glass.isRecycling ? (
+                          <span className="recycling-badge bg-white dark:bg-gray-900 border border-green-500 dark:border-green-400 text-green-700 dark:text-green-400 p-0.5 rounded-full text-sm font-semibold flex items-center justify-center shadow" style={{ width: 22, height: 22 }}>
+                            <span className="text-green-500 dark:text-green-400 text-[15px]">♻️</span>
+                          </span>
+                        ) : (
+                          <span style={{ width: 22, height: 22 }} />
+                        )}
+                        <button
+                          onClick={(e) => toggleFavorite(glass, e)}
+                          className="flex items-center justify-center p-0 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
+                          style={{ width: 24, height: 24 }}
+                        >
+                          <Heart
+                            className={`w-5 h-5 ${
+                              isFavorite(glass)
+                                ? 'fill-red-500 text-red-500'
+                                : 'text-gray-400 hover:text-red-500'
+                            }`}
+                            style={{ width: 20, height: 20 }}
+                          />
+                        </button>
+                      </div>
+                      {/* Kart içeriği */}
                       <div className="flex flex-col items-center w-full">
-                        <div className="relative w-full flex justify-end">
-                          <button
-                            onClick={(e) => toggleFavorite(glass, e)}
-                            className="absolute -top-2 -right-2 p-1 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
-                          >
-                            <Heart
-                              className={`w-5 h-5 ${
-                                isFavorite(glass)
-                                  ? 'fill-red-500 text-red-500'
-                                  : 'text-gray-400 hover:text-red-500'
-                              }`}
-                            />
-                          </button>
-                        </div>
                         <img
                           src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
                           alt={`Gözlük ${idx + 1}`}
-                          className="w-24 h-16 object-contain mb-2"
+                          className="w-24 h-16 object-contain mb-2 mt-4"
                         />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-100">{glass.glassesType}</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-100 mb-0 -mt-2">{glass.glassesType}</span>
                       </div>
-                      <div className="flex flex-col w-full gap-2">
+                      <div className="flex flex-col w-full gap-0.5">
                         {selectedGlassIndex === idx ? (
                           <>
                             <Button
@@ -310,7 +327,7 @@ export const FaceAnalysis: React.FC<{
                                 tryOnGlassesHandler();
                               }}
                               disabled={loading}
-                              className="w-full h-10 text-base rounded-lg bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 shadow font-bold border-0"
+                              className="w-full h-9 text-sm rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0"
                               variant="default"
                             >
                               {loading ? (
@@ -326,7 +343,7 @@ export const FaceAnalysis: React.FC<{
                             <Button
                               onClick={(e) => handleViewDetails(glass, e)}
                               variant="outline"
-                              className="w-full h-8 text-sm border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white transition-colors"
+                              className="w-full h-8 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors"
                             >
                               Detayları Gör
                             </Button>
@@ -359,34 +376,49 @@ export const FaceAnalysis: React.FC<{
                   {glasses.map((glass, idx) => (
                     <div
                       key={glass.id}
-                      className={`flex flex-col items-center shadow-md p-2 bg-white dark:bg-gray-900 min-w-[110px] rounded-xl transition-all duration-150 cursor-pointer h-[180px] justify-between ${
-                        selectedGlassIndex === idx ? 'border-2 border-[#1e3a8a] dark:border-blue-400' : 'border border-gray-200 dark:border-gray-800'
-                      }`}
+                      className={`flex flex-col items-center shadow-sm p-2 min-w-[110px] rounded-2xl transition-all duration-150 cursor-pointer h-[180px] justify-between
+                        ${glass.isRecycling
+                          ? selectedGlassIndex === idx
+                            ? 'border-2 border-green-600 dark:border-green-400'
+                            : 'border border-green-500 dark:border-green-400'
+                          : selectedGlassIndex === idx
+                            ? 'border-2 border-[#1e3a8a] dark:border-blue-400'
+                            : 'border border-gray-200 dark:border-gray-800'}
+                        bg-white dark:bg-gray-900 relative`}
                       onClick={() => handleGlassSelect(glass)}
                     >
-                      <div className="flex flex-col items-center">
-                        <div className="relative w-full flex justify-end">
-                          <button
-                            onClick={(e) => toggleFavorite(glass, e)}
-                            className="absolute -top-2 -right-2 p-1 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
-                          >
-                            <Heart
-                              className={`w-5 h-5 ${
-                                isFavorite(glass)
-                                  ? 'fill-red-500 text-red-500'
-                                  : 'text-gray-400 hover:text-red-500'
-                              }`}
-                            />
-                          </button>
-                        </div>
+                      <div className="flex flex-row justify-between items-start w-full px-1 pt-1">
+                        {glass.isRecycling ? (
+                          <span className="recycling-badge bg-white dark:bg-gray-900 border border-green-500 dark:border-green-400 text-green-700 dark:text-green-400 p-0.5 rounded-full text-sm font-semibold flex items-center justify-center shadow" style={{ width: 22, height: 22 }}>
+                            <span className="text-green-500 dark:text-green-400 text-[15px]">♻️</span>
+                          </span>
+                        ) : (
+                          <span style={{ width: 22, height: 22 }} />
+                        )}
+                        <button
+                          onClick={(e) => toggleFavorite(glass, e)}
+                          className="flex items-center justify-center p-0 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
+                          style={{ width: 24, height: 24 }}
+                        >
+                          <Heart
+                            className={`w-5 h-5 ${
+                              isFavorite(glass)
+                                ? 'fill-red-500 text-red-500'
+                                : 'text-gray-400 hover:text-red-500'
+                            }`}
+                            style={{ width: 20, height: 20 }}
+                          />
+                        </button>
+                      </div>
+                      <div className="flex flex-col items-center -mt-4">
                         <img
                           src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
                           alt={`Gözlük ${idx + 1}`}
                           className="w-20 h-14 object-contain mb-2"
                         />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-100">{glass.glassesType}</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-100 mb-0 -mt-2">{glass.glassesType}</span>
                       </div>
-                      <div className="flex flex-col w-full gap-2">
+                      <div className="flex flex-col w-full gap-0.5">
                         {selectedGlassIndex === idx ? (
                           <>
                             <Button
@@ -395,12 +427,12 @@ export const FaceAnalysis: React.FC<{
                                 tryOnGlassesHandler();
                               }}
                               disabled={loading}
-                              className="w-full h-9 text-sm rounded-lg bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 shadow font-bold border-0"
+                              className="w-full h-8 text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0"
                               variant="default"
                             >
                               {loading ? (
                                 <div className="flex items-center justify-center">
-                                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                   </svg>
@@ -411,7 +443,7 @@ export const FaceAnalysis: React.FC<{
                             <Button
                               onClick={(e) => handleViewDetails(glass, e)}
                               variant="outline"
-                              className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white transition-colors"
+                              className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors"
                             >
                               Detayları Gör
                             </Button>
