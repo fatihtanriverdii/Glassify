@@ -57,7 +57,7 @@ export default function AboutPage() {
           Fatih Tanrıverdi olarak, teknoloji ile insan yaşamını daha konforlu hale getirmeyi amaçlayan yenilikçi projeler geliştiriyorum. "Yüz Şekline Göre Akıllı Gözlük Öneri Sistemi" projemle, alışveriş deneyimini kişiselleştiriyor ve herkesin yüz yapısına en uygun gözlük modellerine zahmetsizce ulaşmasını sağlıyorum.
         </p>
         <p className="text-gray-600 dark:text-gray-200 mb-4">
-          Yapay zeka, yüz analizi ve artırılmış gerçeklik teknolojilerini bir araya getirerek kullanıcıların hijyenik, hızlı ve güvenilir bir sanal deneme ortamı yaşamalarına olanak sunuyorum.
+          Yapay zeka, yüz analizi ve artırılmış gerçeklik teknolojilerini bir araya getirerek kullanıcıların hijyenik, hızlı ve güvenilir bir sanal deneme ortamı yaşamalarına olanak sunuyorum. Aynı zamanda sürdürülebilir bir gelecek vizyonuyla, geri dönüştürülmüş ürünleri destekleyerek çevresel etkiyi azaltmayı hedefliyorum.
         </p>
         <p className="text-gray-600 dark:text-gray-200 mb-4">
           Bu proje, zaman tasarrufu sağlamak, alışveriş deneyimini iyileştirmek ve kullanıcıların özgüvenini artırmak amacıyla geliştirilmiştir. İnsana değer veren, teknolojiyi akıllıca kullanan ve sürdürülebilirliği önemseyen bir bakış açısıyla çalışmalarımı sürdürüyorum.

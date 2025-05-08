@@ -27,6 +27,7 @@ const UploadGlassesPage = () => {
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const [isRecycling, setIsRecycling] = useState(false);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -101,7 +102,7 @@ const UploadGlassesPage = () => {
 
         setIsLoading(true);
         try {
-            const response = await uploadGlasses(selectedImage, glassesType as GlassesType, faceShapes, link);
+            const response = await uploadGlasses(selectedImage, glassesType as GlassesType, faceShapes, link, isRecycling);
             toast({
                 title: response.isSuccess ? 'Başarılı' : 'Hata',
                 description: response.message,
@@ -120,6 +121,7 @@ const UploadGlassesPage = () => {
                     round: false,
                     square: false
                 });
+                setIsRecycling(false);
             }
         } catch (error) {
             toast({
@@ -293,6 +295,25 @@ const UploadGlassesPage = () => {
                                     </label>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">
+                            Geri Dönüşümlü Ürün
+                        </label>
+                        <div className="flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-green-600" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M21.82 15.42l-2.13-3.7c-.28-.48-.9-.64-1.37-.36-.48.28-.64.9-.36 1.37l.36.62h-3.13l1.56-2.7c.28-.48.12-1.09-.36-1.37-.48-.28-1.09-.12-1.37.36l-2.13 3.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l.36-.62h3.13l-1.56 2.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l2.13-3.7c.28-.48.12-1.09-.36-1.37zM7.5 3.5c-.34 0-.67.18-.87.49l-2.13 3.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l.36-.62h3.13l-1.56 2.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l2.13-3.7c.28-.48.12-1.09-.36-1.37-.48-.28-1.09-.12-1.37.36l-1.56 2.7h-3.13l.36-.62c.28-.48.12-1.09-.36-1.37-.48-.28-1.09-.12-1.37.36l-2.13 3.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l2.13-3.7c.28-.48.12-1.09-.36-1.37z"/>
+                            </svg>
+                            <Checkbox
+                                id="isRecycling"
+                                checked={isRecycling}
+                                onCheckedChange={(checked: boolean | 'indeterminate') => setIsRecycling(checked === true)}
+                            />
+                            <label htmlFor="isRecycling" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Bu gözlük geri dönüşümlü materyalden üretilmiştir
+                            </label>
                         </div>
                     </div>
 

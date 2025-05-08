@@ -4,4 +4,5 @@ export interface Glass {
   link: string;
   glassesType: string;
   brand: string;
+  isRecycling: boolean;
 } 

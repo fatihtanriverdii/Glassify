@@ -119,7 +119,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
   };
 
   return (
-    <div className="w-full mt-8">
+    <div className="w-full mt-8 overflow-x-hidden">
       <div className="flex justify-center sm:justify-end items-center mb-4 gap-4">
         <button
           onClick={() => setShowFavorites((prev: boolean) => !prev)}
@@ -135,32 +135,53 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
         {favoriteGlasses.length > 0 && (
           <>
             <h2 className="text-lg font-bold text-[#1e3a8a] dark:text-blue-300 mb-4">Favori Gözlükleriniz</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-w-full overflow-x-hidden">
               {favoriteGlasses.map((glass, idx) => {
                 const isSelected = selectedGlassIndex?.type === 'fav' && selectedGlassIndex.index === idx;
                 return (
                   <div
                     key={glass.id + '-' + idx}
-                    className={`flex flex-col items-center shadow-md p-2 sm:p-4 bg-white dark:bg-[#23272f] w-full min-w-0 rounded-xl transition-all duration-150 cursor-pointer h-48 sm:h-[220px] justify-between ${isSelected ? 'border-2 border-[#1e3a8a] dark:border-blue-400' : 'border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'}`}
+                    className={`flex flex-col items-center shadow-sm p-4 min-w-0 sm:min-w-[140px] rounded-2xl transition-all duration-150 cursor-pointer h-48 sm:h-[220px] justify-between
+                      ${glass.isRecycling
+                        ? selectedGlassIndex?.type === 'fav' && selectedGlassIndex.index === idx
+                          ? 'border-2 border-green-500 dark:border-green-400'
+                          : 'border border-green-500 dark:border-green-400'
+                        : selectedGlassIndex?.type === 'fav' && selectedGlassIndex.index === idx
+                          ? 'border-2 border-[#1e3a8a] dark:border-blue-400'
+                          : 'border border-gray-200 dark:border-gray-800'}
+                      bg-white dark:bg-gray-900 relative
+                      w-full max-w-xs sm:max-w-none
+                      `}
                     onClick={() => setSelectedGlassIndex({ type: 'fav', index: idx })}
                   >
-                    <div className="w-full h-12 sm:h-16 flex items-center justify-center relative mb-2">
-                      <div className="absolute -top-2 -right-2 z-10">
-                        <button
-                          onClick={e => { e.stopPropagation(); toggleFavorite(glass, e); }}
-                          className="p-1 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
-                        >
-                          <Heart
-                            className="w-5 h-5 fill-red-500 text-red-500"
-                          />
-                        </button>
-                      </div>
-                      <img
-                        src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
-                        alt={`Gözlük Favori ${idx + 1}`}
-                        className="w-20 h-12 sm:w-24 sm:h-16 object-contain"
-                      />
+                    {glass.isRecycling && (
+                      <span
+                        className="absolute top-2 left-2 bg-white dark:bg-gray-900 border border-green-500 dark:border-green-400 text-green-700 dark:text-green-400 p-0.5 rounded-full flex items-center justify-center z-20 shadow"
+                        style={{ width: 24, height: 24 }}
+                      >
+                        <span className="text-green-500 dark:text-green-400 text-base">♻️</span>
+                      </span>
+                    )}
+                    <div className="absolute top-2 right-2 z-20">
+                      <button
+                        onClick={e => { e.stopPropagation(); toggleFavorite(glass, e); }}
+                        className="p-0.5 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
+                        style={{ width: 24, height: 24 }}
+                      >
+                        <Heart
+                          className={`w-5 h-5 ${
+                            isFavorite(glass)
+                              ? 'fill-red-500 text-red-500'
+                              : 'text-gray-400 hover:text-red-500'
+                          }`}
+                        />
+                      </button>
                     </div>
+                    <img
+                      src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
+                      alt={`Gözlük Favori ${idx + 1}`}
+                      className="w-20 h-12 sm:w-24 sm:h-16 object-contain"
+                    />
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-100">{glass.glassesType}</span>
                     <div className="flex flex-col w-full gap-0.5 sm:gap-1 mt-4">
                       {isSelected ? (
@@ -168,25 +189,28 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                           <button
                             onClick={e => { e.stopPropagation(); tryOnGlasses(glass); }}
                             disabled={processing}
-                            className="w-full h-8 text-sm sm:h-9 sm:text-base rounded-lg bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 shadow font-bold border-0 flex items-center justify-center transition-colors"
+                            className="w-full h-8 text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0 flex items-center justify-center transition-colors sm:h-9 sm:text-base"
                           >
                             {processing ? (
-                              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
+                              <div className="flex items-center justify-center">
+                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                İşleniyor...
+                              </div>
                             ) : 'Gözlük Dene'}
                           </button>
                           <button
                             onClick={e => { e.stopPropagation(); setSelectedGlassUrl(glass.link); setSelectedGlassImage(glass.image); setShowDetails(true); }}
-                            className="w-full h-7 text-xs sm:h-7 sm:text-sm border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white transition-colors rounded-lg"
+                            className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm"
                           >
                             Detayları Gör
                           </button>
                         </>
                       ) : (
                         <button
-                          className="w-full h-8 text-sm sm:h-10 sm:text-sm text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0"
+                          className="w-full h-8 text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0 sm:h-10 sm:text-sm"
                         >
                           Seç
                         </button>
@@ -202,7 +226,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
       <h2 className="text-xl font-semibold mb-4 text-center text-gray-800 dark:text-blue-300">
         Tüm Gözlükler
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl max-w-full overflow-x-hidden">
         {glasses.map((glass, index) => {
           const isLastElement = index === glasses.length - 1;
           const isSelected = selectedGlassIndex?.type === 'all' && selectedGlassIndex.index === index;
@@ -210,30 +234,47 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
             <div
               key={`${glass.id}-${index}`}
               ref={isLastElement ? lastGlassElementRef : null}
-              className={`flex flex-col items-center shadow-md p-2 sm:p-4 bg-white dark:bg-[#23272f] w-full min-w-0 rounded-xl transition-all duration-150 cursor-pointer h-48 sm:h-[220px] justify-between ${isSelected ? 'border-2 border-[#1e3a8a] dark:border-blue-400' : 'border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'}`}
+              className={`flex flex-col items-center shadow-sm p-4 min-w-0 sm:min-w-[140px] rounded-2xl transition-all duration-150 cursor-pointer h-48 sm:h-[220px] justify-between
+                ${glass.isRecycling
+                  ? selectedGlassIndex?.type === 'all' && selectedGlassIndex.index === index
+                    ? 'border-2 border-green-500 dark:border-green-400'
+                    : 'border border-green-500 dark:border-green-400'
+                  : selectedGlassIndex?.type === 'all' && selectedGlassIndex.index === index
+                    ? 'border-2 border-[#1e3a8a] dark:border-blue-400'
+                    : 'border border-gray-200 dark:border-gray-800'}
+                bg-white dark:bg-gray-900 relative
+                w-full max-w-xs sm:max-w-none
+                `}
               onClick={() => setSelectedGlassIndex({ type: 'all', index })}
             >
-              <div className="w-full h-12 sm:h-16 flex items-center justify-center relative mb-2">
-                <div className="absolute -top-2 -right-2 z-10">
-                  <button
-                    onClick={(e) => toggleFavorite(glass, e)}
-                    className="p-1 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${
-                        isFavorite(glass)
-                          ? 'fill-red-500 text-red-500'
-                          : 'text-gray-400 hover:text-red-500'
-                      }`}
-                    />
-                  </button>
-                </div>
-                <img
-                  src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
-                  alt={`Gözlük ${index + 1}`}
-                  className="w-20 h-12 sm:w-24 sm:h-16 object-contain"
-                />
+              {glass.isRecycling && (
+                <span
+                  className="absolute top-2 left-2 bg-white dark:bg-gray-900 border border-green-500 dark:border-green-400 text-green-700 dark:text-green-400 p-0.5 rounded-full flex items-center justify-center z-20 shadow"
+                  style={{ width: 24, height: 24 }}
+                >
+                  <span className="text-green-500 dark:text-green-400 text-base">♻️</span>
+                </span>
+              )}
+              <div className="absolute top-2 right-2 z-20">
+                <button
+                  onClick={e => { e.stopPropagation(); toggleFavorite(glass, e); }}
+                  className="p-0.5 rounded-full bg-white dark:bg-gray-800 shadow-md hover:scale-110 transition-transform"
+                  style={{ width: 24, height: 24 }}
+                >
+                  <Heart
+                    className={`w-5 h-5 ${
+                      isFavorite(glass)
+                        ? 'fill-red-500 text-red-500'
+                        : 'text-gray-400 hover:text-red-500'
+                    }`}
+                  />
+                </button>
               </div>
+              <img
+                src={glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`}
+                alt={`Gözlük ${index + 1}`}
+                className="w-20 h-12 sm:w-24 sm:h-16 object-contain"
+              />
               <span className="text-sm font-medium text-gray-600 dark:text-gray-100">{glass.glassesType}</span>
               <div className="flex flex-col w-full gap-0.5 sm:gap-1 mt-4">
                 {isSelected ? (
@@ -241,25 +282,28 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                     <button
                       onClick={e => { e.stopPropagation(); tryOnGlasses(glass); }}
                       disabled={processing}
-                      className="w-full h-8 text-sm sm:h-9 sm:text-base rounded-lg bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-400 shadow font-bold border-0 flex items-center justify-center transition-colors"
+                      className="w-full h-8 text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0 flex items-center justify-center transition-colors sm:h-9 sm:text-base"
                     >
                       {processing ? (
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+                        <div className="flex items-center justify-center">
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          İşleniyor...
+                        </div>
                       ) : 'Gözlük Dene'}
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); setSelectedGlassUrl(glass.link); setSelectedGlassImage(glass.image); setShowDetails(true); }}
-                      className="w-full h-7 text-xs sm:h-7 sm:text-sm border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white transition-colors rounded-lg"
+                      className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm"
                     >
                       Detayları Gör
                     </button>
                   </>
                 ) : (
                   <button
-                    className="w-full h-8 text-sm sm:h-10 sm:text-sm text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0"
+                    className="w-full h-8 text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0 sm:h-10 sm:text-sm"
                   >
                     Seç
                   </button>

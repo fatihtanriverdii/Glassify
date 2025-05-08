@@ -50,6 +50,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => 
             variant: "destructive",
             duration: 3000,
           });
+          setLoading(false);
           return;
         }
         setCapturedImage(imageSrc);
@@ -166,6 +167,28 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onAnalysisComplete }) => 
                   border: isDark ? '1px solid #333' : '1px solid #e5e7eb'
                 }}
               />
+              {loading && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    borderRadius: '12px',
+                    zIndex: 1
+                  }}
+                >
+                  <Box sx={{ textAlign: 'center', color: 'white' }}>
+                    <CircularProgress color="inherit" />
+                    <Typography sx={{ mt: 2 }}>Yüz Tespiti Yapılıyor...</Typography>
+                  </Box>
+                </Box>
+              )}
               <Box
                 sx={{
                   position: 'absolute',

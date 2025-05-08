@@ -47,6 +47,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
             variant: "destructive",
             duration: 3000,
           });
+          setLoading(false);
           return;
         }
         
@@ -205,7 +206,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
               '&:hover': {
                 borderColor: 'primary.main',
                 backgroundColor: 'action.hover'
-              }
+              },
+              position: 'relative'
             }}
             onClick={() => fileInputRef.current?.click()}
             onDragEnter={handleDrag}
@@ -213,6 +215,28 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onAnalysisComplete }) => {
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
+            {loading && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  borderRadius: '8px',
+                  zIndex: 1
+                }}
+              >
+                <Box sx={{ textAlign: 'center', color: 'white' }}>
+                  <CircularProgress color="inherit" />
+                  <Typography sx={{ mt: 2 }}>Yüz Tespiti Yapılıyor...</Typography>
+                </Box>
+              </Box>
+            )}
             <CloudUpload sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom>
               Fotoğraf Yüklemek İçin Tıklayın
