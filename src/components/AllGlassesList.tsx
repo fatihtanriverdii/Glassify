@@ -189,11 +189,11 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                           <button
                             onClick={e => { e.stopPropagation(); tryOnGlasses(glass); }}
                             disabled={processing}
-                            className="w-full h-8 text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0 flex items-center justify-center transition-colors sm:h-9 sm:text-base"
+                            className="w-full h-8 text-[10px] sm:text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0 flex items-center justify-center transition-colors sm:h-9 sm:text-base px-1"
                           >
                             {processing ? (
                               <div className="flex items-center justify-center">
-                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -203,14 +203,14 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                           </button>
                           <button
                             onClick={e => { e.stopPropagation(); setSelectedGlassUrl(glass.link); setSelectedGlassImage(glass.image); setShowDetails(true); }}
-                            className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm"
+                            className="w-full h-7 text-[10px] sm:text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm px-1"
                           >
                             Detayları Gör
                           </button>
                         </>
                       ) : (
                         <button
-                          className="w-full h-8 text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0 sm:h-10 sm:text-sm"
+                          className="w-full h-8 text-[10px] sm:text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0 sm:h-10 sm:text-sm px-1"
                         >
                           Seç
                         </button>
@@ -282,11 +282,11 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                     <button
                       onClick={e => { e.stopPropagation(); tryOnGlasses(glass); }}
                       disabled={processing}
-                      className="w-full h-8 text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0 flex items-center justify-center transition-colors sm:h-9 sm:text-base"
+                      className="w-full h-8 text-[10px] sm:text-xs rounded-lg bg-blue-600 dark:bg-blue-400 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-blue-300 shadow font-bold border-0 flex items-center justify-center transition-colors sm:h-9 sm:text-base px-1"
                     >
                       {processing ? (
                         <div className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
@@ -296,14 +296,14 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                     </button>
                     <button
                       onClick={e => { e.stopPropagation(); setSelectedGlassUrl(glass.link); setSelectedGlassImage(glass.image); setShowDetails(true); }}
-                      className="w-full h-7 text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm"
+                      className="w-full h-7 text-[10px] sm:text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm px-1"
                     >
                       Detayları Gör
                     </button>
                   </>
                 ) : (
                   <button
-                    className="w-full h-8 text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0 sm:h-10 sm:text-sm"
+                    className="w-full h-8 text-[10px] sm:text-xs text-gray-500 dark:text-gray-200 hover:text-[#1e3a8a] dark:hover:text-blue-400 bg-transparent border-0 sm:h-10 sm:text-sm px-1"
                   >
                     Seç
                   </button>
@@ -330,22 +330,22 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
         />
       )}
       {showTryOnModal && processedImage && (
-        <div className="fixed inset-0 z-[1003] flex items-center justify-center bg-black/60 dark:bg-black/70">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 max-w-lg w-full flex flex-col items-center relative">
+        <div className="fixed inset-0 z-[1003] flex items-center justify-center bg-black/60 dark:bg-black/70 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 sm:p-6 max-w-lg w-full flex flex-col items-center relative mt-12 sm:mt-0">
             <button
               onClick={() => { setProcessedImage(null); setShowTryOnModal(false); setTryOnSize(2.5); }}
-              className="absolute top-4 right-4 z-20 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-lg text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 focus:outline-none p-3 rounded-full transition-colors duration-200 flex items-center justify-center group"
+              className="absolute -top-3 -right-3 z-20 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 shadow-lg text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 focus:outline-none p-2 rounded-full transition-colors duration-200 flex items-center justify-center group"
               style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
               aria-label="Kapat"
             >
-              <svg className="w-7 h-7 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-7 sm:h-7 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <img src={processedImage} alt="Gözlük Deneme Sonucu" className="w-full h-auto rounded-xl object-contain" />
             <div className="mt-4 w-full flex flex-col items-center">
-              <div className="bg-[#f9f9f9] dark:bg-gray-900 rounded-xl shadow-lg p-4 max-w-md w-full flex flex-col items-center border border-gray-100 dark:border-gray-800">
-                <label htmlFor="tryon-size-slider" className="block text-base font-semibold text-[#1e3a8a] dark:text-blue-300 mb-2">
+              <div className="bg-[#f9f9f9] dark:bg-gray-900 rounded-xl shadow-lg p-3 sm:p-4 max-w-md w-full flex flex-col items-center border border-gray-100 dark:border-gray-800">
+                <label htmlFor="tryon-size-slider" className="block text-sm sm:text-base font-semibold text-[#1e3a8a] dark:text-blue-300 mb-2">
                   Gözlük Boyutu
                 </label>
                 <input
@@ -366,11 +366,11 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                   }}
                   className="w-full h-2 bg-[#93c5fd] dark:bg-blue-900 rounded-lg appearance-none cursor-pointer accent-[#1e3a8a] dark:accent-blue-400"
                 />
-                <div className="flex justify-between w-full text-xs text-gray-400 dark:text-gray-300 mt-1">
+                <div className="flex justify-between w-full text-[10px] sm:text-xs text-gray-400 dark:text-gray-300 mt-1">
                   <span>Küçük</span>
                   <span>Büyük</span>
                 </div>
-                <div className="text-xs text-gray-400 dark:text-gray-300 mt-1 text-center">Boyut ayarını yaparak yüzünüze en uygun şekilde deneyin.</div>
+                <div className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-300 mt-1 text-center">Boyut ayarını yaparak yüzünüze en uygun şekilde deneyin.</div>
               </div>
             </div>
           </div>
