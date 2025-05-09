@@ -138,24 +138,24 @@ const UploadGlassesPage = () => {
         <div className="container mx-auto py-8 px-4">
             <button
                 onClick={() => router.back()}
-                className="mb-4 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-200 flex items-center gap-2 transition-all duration-200"
+                className="mb-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-2 transition-all duration-200"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
                 Geri
             </button>
-            <Card className="max-w-2xl mx-auto bg-white shadow-xl border-0">
-                <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-xl">
+            <Card className="max-w-2xl mx-auto bg-white dark:bg-gray-900 shadow-xl border-0 dark:border-gray-800">
+                <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-blue-600 to-blue-700 text-white dark:text-gray-200 rounded-t-xl">
                     <CardTitle className="text-2xl font-bold text-center">Gözlük Yükle</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
                     <div 
                         className={`
                             relative border-2 border-dashed rounded-lg p-6
-                            ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
+                            ${dragActive ? 'border-blue-500 bg-blue-50 dark:bg-gray-800' : 'border-gray-300'}
                             transition-colors duration-200 ease-in-out
-                            ${!selectedImage ? 'hover:border-blue-400 hover:bg-blue-50 cursor-pointer' : 'bg-gray-50'}
+                            ${!selectedImage ? 'hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 cursor-pointer' : 'bg-gray-50 dark:bg-gray-800'}
                         `}
                         onDragEnter={handleDrag}
                         onDragLeave={handleDrag}
@@ -189,13 +189,13 @@ const UploadGlassesPage = () => {
                                         />
                                     </svg>
                                 </div>
-                                <div className="text-lg font-medium text-gray-800 mb-1">
+                                <div className="text-lg font-medium text-gray-800 dark:text-gray-100 font-semibold mb-1">
                                     Fotoğraf yüklemek için tıklayın
                                 </div>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-gray-600 dark:text-gray-300">
                                     veya dosyayı sürükleyip bırakın
                                 </p>
-                                <p className="text-xs text-gray-500 mt-2">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                     PNG, JPG veya GIF (max. 5MB)
                                 </p>
                             </div>
@@ -233,28 +233,28 @@ const UploadGlassesPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             Gözlük Tipi
                         </label>
                         <Select value={glassesType} onValueChange={(value) => setGlassesType(value as GlassesType)}>
-                            <SelectTrigger className="w-full bg-white border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-blue-500">
+                            <SelectTrigger className="w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-blue-400 focus:border-blue-500 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-800 hover:bg-white dark:hover:bg-gray-800">
                                 <SelectValue placeholder="Gözlük tipini seçin" />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Round">Yuvarlak</SelectItem>
-                                <SelectItem value="CatEye">Cat Eye</SelectItem>
-                                <SelectItem value="Rectangle">Dikdörtgen</SelectItem>
-                                <SelectItem value="Square">Kare</SelectItem>
-                                <SelectItem value="Aviator">Aviator</SelectItem>
-                                <SelectItem value="Geometric">Geometrik</SelectItem>
-                                <SelectItem value="Browline">Browline</SelectItem>
-                                <SelectItem value="Oval">Oval</SelectItem>
+                            <SelectContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                                <SelectItem value="Round" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Yuvarlak</SelectItem>
+                                <SelectItem value="CatEye" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Cat Eye</SelectItem>
+                                <SelectItem value="Rectangle" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Dikdörtgen</SelectItem>
+                                <SelectItem value="Square" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Kare</SelectItem>
+                                <SelectItem value="Aviator" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Aviator</SelectItem>
+                                <SelectItem value="Geometric" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Geometrik</SelectItem>
+                                <SelectItem value="Browline" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Browline</SelectItem>
+                                <SelectItem value="Oval" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=checked]:bg-blue-100 dark:data-[state=checked]:bg-gray-700">Oval</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             Link
                         </label>
                         <input
@@ -262,12 +262,12 @@ const UploadGlassesPage = () => {
                             value={link}
                             onChange={(e) => setLink(e.target.value)}
                             placeholder="Gözlük satış linkini girin"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500 focus:bg-white dark:focus:bg-gray-800 hover:bg-white dark:hover:bg-gray-800"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             Uygun Yüz Şekilleri
                         </label>
                         <div className="grid grid-cols-2 gap-4">
@@ -299,13 +299,13 @@ const UploadGlassesPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
                             Geri Dönüşümlü Ürün
                         </label>
                         <div className="flex items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-green-600" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M21.82 15.42l-2.13-3.7c-.28-.48-.9-.64-1.37-.36-.48.28-.64.9-.36 1.37l.36.62h-3.13l1.56-2.7c.28-.48.12-1.09-.36-1.37-.48-.28-1.09-.12-1.37.36l-2.13 3.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l.36-.62h3.13l-1.56 2.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l2.13-3.7c.28-.48.12-1.09-.36-1.37zM7.5 3.5c-.34 0-.67.18-.87.49l-2.13 3.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l.36-.62h3.13l-1.56 2.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l2.13-3.7c.28-.48.12-1.09-.36-1.37-.48-.28-1.09-.12-1.37.36l-1.56 2.7h-3.13l.36-.62c.28-.48.12-1.09-.36-1.37-.48-.28-1.09-.12-1.37.36l-2.13 3.7c-.28.48-.12 1.09.36 1.37.16.09.33.13.5.13.34 0 .67-.18.87-.49l2.13-3.7c.28-.48.12-1.09-.36-1.37z"/>
-                            </svg>
+                            <span className="recycling-badge bg-white dark:bg-gray-900 border border-green-500 dark:border-green-400 text-green-700 dark:text-green-400 p-0.5 rounded-full text-sm font-semibold flex items-center justify-center shadow" style={{ width: 22, height: 22 }}>
+                              <span className="text-green-500 dark:text-green-400 text-[15px]">♻️</span>
+                            </span>
                             <Checkbox
                                 id="isRecycling"
                                 checked={isRecycling}
@@ -318,7 +318,7 @@ const UploadGlassesPage = () => {
                     </div>
 
                     <Button
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+                        className="w-full bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white dark:text-gray-200 transition-colors duration-200"
                         onClick={handleSubmit}
                         disabled={isLoading || !selectedImage || !glassesType || !Object.values(faceShapes).some(value => value)}
                     >

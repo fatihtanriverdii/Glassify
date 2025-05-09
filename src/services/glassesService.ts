@@ -19,15 +19,23 @@ interface DecodedToken {
 export interface Glass {
     id: string;
     image: string;
-    faceType: FaceType;
-    glassesType: GlassesType;
-    createdAt: string;
+    glassesType: string;
+    link: string;
+    isRecycling: boolean;
+    oval: boolean;
+    oblong: boolean;
+    heart: boolean;
+    round: boolean;
+    square: boolean;
+    createdAt?: string;
 }
 
 export interface GetGlassesResponse {
-    isSuccess: boolean;
-    message: string;
-    data: Glass[];
+    items: Glass[];
+    pageNumber: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
 }
 
 // Load face-api.js models
@@ -121,59 +129,38 @@ export const uploadGlasses = async (
     }
 };
 
-export const getSellerGlasses = async (): Promise<GetGlassesResponse> => {
-    try {
-        const token = localStorage.getItem('token') || 
-            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-        
-        if (!token) {
-            throw new Error('Token bulunamadı');
-        }
-
-        const decoded = jwtDecode(token) as DecodedToken;
-
-        const response = await fetch(`${API_URL}/User/glasses?email=${decoded.email}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        });
-
-        if (!response.ok) {
-            throw new Error('API yanıt vermedi');
-        }
-
-        const data = await response.json();
-        
-        if (!data.isSuccess || !data.glasses) {
-            return {
-                isSuccess: false,
-                message: data.message || 'Geçersiz veri formatı',
-                data: []
-            };
-        }
-
-        return {
-            isSuccess: true,
-            message: 'Gözlükler başarıyla getirildi.',
-            data: data.glasses.map((glass: any) => ({
-                id: glass.id.toString(),
-                image: `data:image/jpeg;base64,${glass.image}`,
-                faceType: glass.faceType,
-                glassesType: glass.glassesType,
-                createdAt: new Date().toISOString()
-            }))
-        };
-    } catch (error) {
-        console.error('Gözlükler getirilirken hata:', error);
-        return {
-            isSuccess: false,
-            message: 'Gözlükler getirilirken bir hata oluştu.',
-            data: []
-        };
+export const getSellerGlasses = async (page = 1): Promise<GetGlassesResponse> => {
+    const token = localStorage.getItem('token') || 
+        document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    
+    if (!token) {
+        throw new Error('Token bulunamadı');
     }
+
+    const decoded = jwtDecode(token) as DecodedToken;
+
+    const response = await fetch(`${API_URL}/User/glasses?email=${decoded.email}&pageNumber=${page}&pageSize=5`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        throw new Error('API yanıt vermedi');
+    }
+
+    const data = await response.json();
+
+    data.items = (data.items || []).map((glass: any) => ({
+        ...glass,
+        id: glass.id.toString(),
+        image: glass.image.startsWith('data:') ? glass.image : `data:image/jpeg;base64,${glass.image}`,
+    }));
+
+    return data;
 };
 
 export const tryOnGlasses = async (faceImage: string, glassesImage: string, sizeMultiplier: number = 2.5): Promise<string> => {
