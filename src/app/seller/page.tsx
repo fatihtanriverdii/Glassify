@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Container, Typography, Paper, Grid, Box } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
+
 // JWT decode helper
 function parseJwt(token: string) {
   try {
@@ -62,7 +64,7 @@ export default function SellerDashboard() {
       setStatsLoading(false);
       return;
     }
-    fetch(`http://localhost:7289/api/User/statistics?email=${encodeURIComponent(email)}`, {
+    fetch(`${API_URL}/User/statistics?email=${encodeURIComponent(email)}`, {
       headers: {
         'accept': '*/*',
         'Authorization': `Bearer ${token.replace('Bearer ', '')}`,
