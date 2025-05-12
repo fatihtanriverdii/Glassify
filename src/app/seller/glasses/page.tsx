@@ -4,10 +4,17 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Container, Typography, Grid, Card, CardContent, CardMedia, Box, Chip, IconButton, Skeleton, CircularProgress } from '@mui/material';
-import { getSellerGlasses, Glass, deleteGlasses } from '@/services/glassesService';
+import { getSellerGlasses, Glass, deleteGlasses, setGlassesActive, setAllGlassesActive } from '@/services/glassesService';
 import { useToast } from '@/components/ui/use-toast';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTheme } from '@mui/material/styles';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import Stack from '@mui/material/Stack';
 
 export default function SellerGlasses() {
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -20,6 +27,7 @@ export default function SellerGlasses() {
   const [loadingMore, setLoadingMore] = useState(false);
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const [allActiveState, setAllActiveState] = useState<'active' | 'passive' | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -113,24 +121,176 @@ export default function SellerGlasses() {
     }
   };
 
+  // Tekil gözlük aktif/pasif
+  const handleToggleActive = async (id: string, isActive: boolean) => {
+    try {
+      const response = await setGlassesActive(id, isActive);
+      if (response.isSuccess) {
+        setGlasses(prev => prev.map(g => g.id === id ? { ...g, isActive } : g));
+        toast({
+          title: 'Başarılı',
+          description: `Gözlük ${isActive ? 'aktif' : 'pasif'} yapıldı.`,
+        });
+      } else {
+        toast({
+          title: 'Hata',
+          description: response.message,
+          variant: 'destructive'
+        });
+      }
+    } catch {
+      toast({
+        title: 'Hata',
+        description: 'Gözlük durumu güncellenemedi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Tümünü aktif/pasif yap
+  const handleToggleAllActive = async (isActive: boolean) => {
+    try {
+      const response = await setAllGlassesActive(isActive);
+      if (response.isSuccess) {
+        setGlasses(prev => prev.map(g => ({ ...g, isActive })));
+        toast({
+          title: 'Başarılı',
+          description: `Tüm gözlükler ${isActive ? 'aktif' : 'pasif'} yapıldı.`,
+        });
+      } else {
+        toast({
+          title: 'Hata',
+          description: response.message,
+          variant: 'destructive'
+        });
+      }
+    } catch {
+      toast({
+        title: 'Hata',
+        description: 'Tüm gözlükler güncellenemedi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  if (authLoading) return null;
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-          <button
-            onClick={() => router.back()}
-            className={
-              isDark
-                ? "bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-700 flex items-center gap-2 transition-all duration-200"
-                : "bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-200 flex items-center gap-2 transition-all duration-200"
-            }
-            style={{ boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.08)' }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Geri
-          </button>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, width: '100%' }}>
+          <Box>
+            <button
+              onClick={() => router.back()}
+              className={
+                isDark
+                  ? "bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-700 flex items-center gap-2 transition-all duration-200"
+                  : "bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-200 flex items-center gap-2 transition-all duration-200"
+              }
+              style={{ boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.08)' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Geri
+            </button>
+          </Box>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <ToggleButtonGroup
+              value={allActiveState}
+              exclusive
+              onChange={(_, value) => {
+                if (value === 'active') {
+                  setAllActiveState('active');
+                  handleToggleAllActive(true);
+                } else if (value === 'passive') {
+                  setAllActiveState('passive');
+                  handleToggleAllActive(false);
+                }
+              }}
+              aria-label="Tümünü Aktif/Pasif Yap"
+              sx={{
+                background: isDark ? '#181f2a' : '#fff',
+                boxShadow: isDark ? '0 2px 8px 0 rgba(30,41,59,0.18)' : '0 2px 8px 0 rgba(37,99,235,0.06)',
+                border: isDark ? '2px solid #293040' : '2px solid #e0e7ef',
+                borderRadius: 3,
+                p: 0.5,
+                minHeight: 40,
+                gap: 1.5,
+                flexDirection: 'row',
+                '@media (max-width: 600px)': {
+                  minHeight: 36,
+                  borderRadius: 2,
+                  p: 0.5,
+                  gap: 1,
+                }
+              }}
+            >
+              <ToggleButton value="active" aria-label="Tümünü Aktif Yap" sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 1.5, py: 0.7, fontWeight: 600, fontSize: '1rem', borderRadius: 2,
+                color: allActiveState === 'active' ? (isDark ? '#2563eb' : '#2563eb') : (isDark ? '#60a5fa' : '#2563eb'),
+                background: allActiveState === 'active' ? (isDark ? 'rgba(37,99,235,0.18)' : 'rgba(37,99,235,0.10)') : 'transparent',
+                border: 'none',
+                minWidth: 0,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                boxShadow: allActiveState === 'active' ? (isDark ? '0 2px 8px 0 rgba(37,99,235,0.18)' : '0 2px 8px 0 rgba(37,99,235,0.10)') : 'none',
+                '&:hover': {
+                  background: isDark ? 'rgba(37,99,235,0.22)' : 'rgba(37,99,235,0.13)',
+                },
+                outline: 'none',
+                '@media (max-width: 600px)': {
+                  fontSize: '0.9rem',
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 2,
+                  minWidth: 80,
+                  gap: 0.7,
+                  whiteSpace: 'normal',
+                  textAlign: 'center',
+                }
+              }}>
+                <CheckCircleIcon sx={{ mr: 0.5, fontSize: 18, color: allActiveState === 'active' ? '#2563eb' : '#94a3b8', '@media (max-width: 600px)': { fontSize: 16, mr: 0.3 } }} />
+                <span style={{ display: 'block', lineHeight: 1.1 }}>
+                  Tümünü<br />Aktif Yap
+                </span>
+              </ToggleButton>
+              <ToggleButton value="passive" aria-label="Tümünü Pasif Yap" sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 1.5, py: 0.7, fontWeight: 600, fontSize: '1rem', borderRadius: 2,
+                color: allActiveState === 'passive' ? (isDark ? '#e879f9' : '#a21caf') : (isDark ? '#e879f9' : '#a21caf'),
+                background: allActiveState === 'passive' ? (isDark ? 'rgba(147,51,234,0.18)' : 'rgba(147,51,234,0.10)') : 'transparent',
+                border: 'none',
+                minWidth: 0,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                boxShadow: allActiveState === 'passive' ? (isDark ? '0 2px 8px 0 rgba(147,51,234,0.18)' : '0 2px 8px 0 rgba(147,51,234,0.10)') : 'none',
+                '&:hover': {
+                  background: isDark ? 'rgba(147,51,234,0.22)' : 'rgba(147,51,234,0.13)',
+                },
+                outline: 'none',
+                '@media (max-width: 600px)': {
+                  fontSize: '0.9rem',
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 2,
+                  minWidth: 80,
+                  gap: 0.7,
+                  whiteSpace: 'normal',
+                  textAlign: 'center',
+                }
+              }}>
+                <CancelIcon sx={{ mr: 0.5, fontSize: 18, color: allActiveState === 'passive' ? '#a21caf' : '#bdbdbd', '@media (max-width: 600px)': { fontSize: 16, mr: 0.3 } }} />
+                <span style={{ display: 'block', lineHeight: 1.1 }}>
+                  Tümünü<br />Pasif Yap
+                </span>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
         </Box>
         <Typography 
           variant="h4" 
@@ -144,7 +304,7 @@ export default function SellerGlasses() {
               : 'linear-gradient(45deg, #2563eb, #3b82f6)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 4
+            mb: 2
           }}
         >
           Gözlüklerim
@@ -192,21 +352,120 @@ export default function SellerGlasses() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-        <button
-          onClick={() => router.back()}
-          className={
-            isDark
-              ? "bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-700 flex items-center gap-2 transition-all duration-200"
-              : "bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-200 flex items-center gap-2 transition-all duration-200"
-          }
-          style={{ boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.08)' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Geri
-        </button>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, width: '100%' }}>
+        <Box>
+          <button
+            onClick={() => router.back()}
+            className={
+              isDark
+                ? "bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-700 flex items-center gap-2 transition-all duration-200"
+                : "bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium shadow-sm border border-gray-200 flex items-center gap-2 transition-all duration-200"
+            }
+            style={{ boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.08)' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Geri
+          </button>
+        </Box>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <ToggleButtonGroup
+            value={allActiveState}
+            exclusive
+            onChange={(_, value) => {
+              if (value === 'active') {
+                setAllActiveState('active');
+                handleToggleAllActive(true);
+              } else if (value === 'passive') {
+                setAllActiveState('passive');
+                handleToggleAllActive(false);
+              }
+            }}
+            aria-label="Tümünü Aktif/Pasif Yap"
+            sx={{
+              background: isDark ? '#181f2a' : '#fff',
+              boxShadow: isDark ? '0 2px 8px 0 rgba(30,41,59,0.18)' : '0 2px 8px 0 rgba(37,99,235,0.06)',
+              border: isDark ? '2px solid #293040' : '2px solid #e0e7ef',
+              borderRadius: 3,
+              p: 0.5,
+              minHeight: 40,
+              gap: 1.5,
+              flexDirection: 'row',
+              '@media (max-width: 600px)': {
+                minHeight: 36,
+                borderRadius: 2,
+                p: 0.5,
+                gap: 1,
+              }
+            }}
+          >
+            <ToggleButton value="active" aria-label="Tümünü Aktif Yap" sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1.5, py: 0.7, fontWeight: 600, fontSize: '1rem', borderRadius: 2,
+              color: allActiveState === 'active' ? (isDark ? '#2563eb' : '#2563eb') : (isDark ? '#60a5fa' : '#2563eb'),
+              background: allActiveState === 'active' ? (isDark ? 'rgba(37,99,235,0.18)' : 'rgba(37,99,235,0.10)') : 'transparent',
+              border: 'none',
+              minWidth: 0,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              boxShadow: allActiveState === 'active' ? (isDark ? '0 2px 8px 0 rgba(37,99,235,0.18)' : '0 2px 8px 0 rgba(37,99,235,0.10)') : 'none',
+              '&:hover': {
+                background: isDark ? 'rgba(37,99,235,0.22)' : 'rgba(37,99,235,0.13)',
+              },
+              outline: 'none',
+              '@media (max-width: 600px)': {
+                fontSize: '0.9rem',
+                px: 1,
+                py: 0.5,
+                borderRadius: 2,
+                minWidth: 80,
+                gap: 0.7,
+                whiteSpace: 'normal',
+                textAlign: 'center',
+              }
+            }}>
+              <CheckCircleIcon sx={{ mr: 0.5, fontSize: 18, color: allActiveState === 'active' ? '#2563eb' : '#94a3b8', '@media (max-width: 600px)': { fontSize: 16, mr: 0.3 } }} />
+              <span style={{ display: 'block', lineHeight: 1.1 }}>
+                Tümünü<br />Aktif Yap
+              </span>
+            </ToggleButton>
+            <ToggleButton value="passive" aria-label="Tümünü Pasif Yap" sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1.5, py: 0.7, fontWeight: 600, fontSize: '1rem', borderRadius: 2,
+              color: allActiveState === 'passive' ? (isDark ? '#e879f9' : '#a21caf') : (isDark ? '#e879f9' : '#a21caf'),
+              background: allActiveState === 'passive' ? (isDark ? 'rgba(147,51,234,0.18)' : 'rgba(147,51,234,0.10)') : 'transparent',
+              border: 'none',
+              minWidth: 0,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              boxShadow: allActiveState === 'passive' ? (isDark ? '0 2px 8px 0 rgba(147,51,234,0.18)' : '0 2px 8px 0 rgba(147,51,234,0.10)') : 'none',
+              '&:hover': {
+                background: isDark ? 'rgba(147,51,234,0.22)' : 'rgba(147,51,234,0.13)',
+              },
+              outline: 'none',
+              '@media (max-width: 600px)': {
+                fontSize: '0.9rem',
+                px: 1,
+                py: 0.5,
+                borderRadius: 2,
+                minWidth: 80,
+                gap: 0.7,
+                whiteSpace: 'normal',
+                textAlign: 'center',
+              }
+            }}>
+              <CancelIcon sx={{ mr: 0.5, fontSize: 18, color: allActiveState === 'passive' ? '#a21caf' : '#bdbdbd', '@media (max-width: 600px)': { fontSize: 16, mr: 0.3 } }} />
+              <span style={{ display: 'block', lineHeight: 1.1 }}>
+                Tümünü<br />Pasif Yap
+              </span>
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
       </Box>
       <Typography 
         variant="h4" 
@@ -220,7 +479,7 @@ export default function SellerGlasses() {
             : 'linear-gradient(45deg, #2563eb, #3b82f6)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
-          mb: 4
+          mb: 2
         }}
       >
         Gözlüklerim
@@ -303,6 +562,12 @@ export default function SellerGlasses() {
                       }}
                     />
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Switch
+                        checked={glass.isActive}
+                        onChange={() => handleToggleActive(glass.id, !glass.isActive)}
+                        color="primary"
+                        inputProps={{ 'aria-label': 'Aktiflik durumu' }}
+                      />
                       {glass.isRecycling && (
                         <span
                           className="recycling-badge bg-white dark:bg-gray-900 border border-green-500 dark:border-green-400 text-green-700 dark:text-green-400 p-0.5 rounded-full text-sm font-semibold flex items-center justify-center shadow"

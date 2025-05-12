@@ -3,6 +3,7 @@ import GlassesDetails from './GlassesDetails';
 import { useToast } from '@/components/ui/use-toast';
 import { Heart } from 'lucide-react';
 import { Glass } from '@/types/glasses';
+import { addFavorite, removeFavorite, increaseView } from '@/services/glassesService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
@@ -118,6 +119,23 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
     }
   };
 
+  const handleViewDetails = async (glass: Glass, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await increaseView(glass.id);
+    } catch (err) {
+      toast({
+        title: 'Hata',
+        description: 'Görüntüleme arttırılamadı',
+        variant: 'destructive',
+        duration: 2000
+      });
+    }
+    setSelectedGlassUrl(glass.link);
+    setSelectedGlassImage(glass.image);
+    setShowDetails(true);
+  };
+
   return (
     <div className="w-full mt-8 overflow-x-hidden">
       <div className="flex justify-center sm:justify-end items-center mb-4 gap-4">
@@ -202,7 +220,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                             ) : 'Gözlük Dene'}
                           </button>
                           <button
-                            onClick={e => { e.stopPropagation(); setSelectedGlassUrl(glass.link); setSelectedGlassImage(glass.image); setShowDetails(true); }}
+                            onClick={e => { e.stopPropagation(); handleViewDetails(glass, e); }}
                             className="w-full h-7 text-[10px] sm:text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm px-1"
                           >
                             Detayları Gör
@@ -295,7 +313,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
                       ) : 'Gözlük Dene'}
                     </button>
                     <button
-                      onClick={e => { e.stopPropagation(); setSelectedGlassUrl(glass.link); setSelectedGlassImage(glass.image); setShowDetails(true); }}
+                      onClick={e => { e.stopPropagation(); handleViewDetails(glass, e); }}
                       className="w-full h-7 text-[10px] sm:text-xs border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-blue-200 bg-transparent dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-blue-900 hover:text-black dark:hover:text-white transition-colors rounded-lg sm:h-7 sm:text-sm px-1"
                     >
                       Detayları Gör

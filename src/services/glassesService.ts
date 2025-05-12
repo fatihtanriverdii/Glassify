@@ -28,6 +28,7 @@ export interface Glass {
     round: boolean;
     square: boolean;
     createdAt?: string;
+    isActive: boolean;
 }
 
 export interface GetGlassesResponse {
@@ -370,5 +371,121 @@ export const detectFace = async (imageData: string): Promise<boolean> => {
     } catch (error) {
         console.error('Yüz tespiti hatası:', error);
         return false;
+    }
+};
+
+export const addFavorite = async (glassId: string): Promise<{ isSuccess: boolean; message: string }> => {
+    try {
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        if (!token) throw new Error('Token bulunamadı');
+        const response = await fetch(`${API_URL}/Glasses/${glassId}/favorite`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            }
+        });
+        if (!response.ok && response.status !== 204) {
+            throw new Error('Favorileme işlemi başarısız oldu');
+        }
+        return { isSuccess: true, message: 'Favorilere eklendi' };
+    } catch (error) {
+        return { isSuccess: false, message: error instanceof Error ? error.message : 'Favorileme işlemi başarısız oldu' };
+    }
+};
+
+export const removeFavorite = async (glassId: string): Promise<{ isSuccess: boolean; message: string }> => {
+    try {
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        if (!token) throw new Error('Token bulunamadı');
+        const response = await fetch(`${API_URL}/Glasses/${glassId}/remove/favorite`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            }
+        });
+        if (!response.ok && response.status !== 204) {
+            throw new Error('Favoriden çıkarma işlemi başarısız oldu');
+        }
+        return { isSuccess: true, message: 'Favorilerden çıkarıldı' };
+    } catch (error) {
+        return { isSuccess: false, message: error instanceof Error ? error.message : 'Favoriden çıkarma işlemi başarısız oldu' };
+    }
+};
+
+export const increaseView = async (glassId: string): Promise<{ isSuccess: boolean; message: string }> => {
+    try {
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        if (!token) throw new Error('Token bulunamadı');
+        const response = await fetch(`${API_URL}/Glasses/${glassId}/increase/view`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            }
+        });
+        if (!response.ok && response.status !== 204) {
+            throw new Error('Görüntüleme arttırılamadı');
+        }
+        return { isSuccess: true, message: 'Görüntüleme arttırıldı' };
+    } catch (error) {
+        return { isSuccess: false, message: error instanceof Error ? error.message : 'Görüntüleme arttırılamadı' };
+    }
+};
+
+// Tek bir gözlüğü aktif/pasif yap
+export const setGlassesActive = async (glassId: string, isActive: boolean): Promise<{ isSuccess: boolean; message: string }> => {
+    try {
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        if (!token) throw new Error('Token bulunamadı');
+        const decoded = jwtDecode(token) as DecodedToken;
+        const response = await fetch(`${API_URL}/Glasses/${glassId}/active?email=${encodeURIComponent(decoded.email)}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({ iActive: isActive })
+        });
+        if (!response.ok && response.status !== 204) {
+            throw new Error('Durum güncellenemedi');
+        }
+        return { isSuccess: true, message: 'Durum güncellendi' };
+    } catch (error) {
+        return { isSuccess: false, message: error instanceof Error ? error.message : 'Durum güncellenemedi' };
+    }
+};
+
+// Tüm gözlükleri aktif/pasif yap
+export const setAllGlassesActive = async (isActive: boolean): Promise<{ isSuccess: boolean; message: string }> => {
+    try {
+        const token = localStorage.getItem('token') || 
+            document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+        if (!token) throw new Error('Token bulunamadı');
+        const decoded = jwtDecode(token) as DecodedToken;
+        const response = await fetch(`${API_URL}/Glasses/active?email=${encodeURIComponent(decoded.email)}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({ iActive: isActive })
+        });
+        if (!response.ok && response.status !== 204) {
+            throw new Error('Durum güncellenemedi');
+        }
+        return { isSuccess: true, message: 'Tüm gözlükler güncellendi' };
+    } catch (error) {
+        return { isSuccess: false, message: error instanceof Error ? error.message : 'Tüm gözlükler güncellenemedi' };
     }
 }; 
