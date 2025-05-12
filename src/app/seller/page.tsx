@@ -6,16 +6,80 @@ import { useRouter } from 'next/navigation';
 import { Container, Typography, Paper, Grid, Box } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 
+// JWT decode helper
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
 export default function SellerDashboard() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [stats, setStats] = useState({
+    totalGlasses: 0,
+    activeGlasses: 0,
+    totalViews: 0,
+    totalLikes: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/auth/login');
+  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/auth/login');
     }
   }, [isAuthenticated, loading, router]);
+
+  useEffect(() => {
+    // Token'ı localStorage'dan al
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setStatsLoading(false);
+      return;
+    }
+    // Token'dan email'i bul
+    const decoded = parseJwt(token.replace('Bearer ', ''));
+    const email = decoded?.email;
+    if (!email) {
+      setStatsLoading(false);
+      return;
+    }
+    fetch(`http://localhost:7289/api/User/statistics?email=${encodeURIComponent(email)}`, {
+      headers: {
+        'accept': '*/*',
+        'Authorization': `Bearer ${token.replace('Bearer ', '')}`,
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setStats({
+          totalGlasses: data.totalGlasses,
+          activeGlasses: data.activeGlasses,
+          totalViews: data.totalViews,
+          totalLikes: data.totalLikes,
+        });
+        setStatsLoading(false);
+      })
+      .catch(() => setStatsLoading(false));
+  }, []);
 
   const handleNavigation = (path: string) => {
     setIsNavigating(true);
@@ -35,21 +99,29 @@ export default function SellerDashboard() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        gutterBottom 
-        sx={{
-          textAlign: 'center',
-          fontWeight: 'bold',
-          background: 'linear-gradient(45deg, #2563eb, #3b82f6)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          mb: 4
-        }}
-      >
-        Satıcı Paneli
-      </Typography>
+      <Box sx={{ position: 'relative', mb: 4 }}>
+        <Typography 
+          variant="h4" 
+          component="h1" 
+          sx={{
+            fontWeight: 'bold',
+            background: 'linear-gradient(45deg, #2563eb, #3b82f6)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Satıcı Paneli
+        </Typography>
+        <button
+          onClick={handleLogout}
+          className="absolute top-0 right-0 text-gray-500 hover:text-red-500 transition-colors duration-200 flex items-center gap-1 text-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Çıkış Yap
+        </button>
+      </Box>
       
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
@@ -189,7 +261,7 @@ export default function SellerDashboard() {
                       <svg width="28" height="28" fill="none" stroke="#2563eb" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 12l2 2 4-4" /></svg>
                     ),
                     label: 'Toplam Gözlük',
-                    value: 0,
+                    value: statsLoading ? <CircularProgress size={24} /> : stats.totalGlasses,
                     color: 'primary.main',
                   },
                   {
@@ -197,7 +269,7 @@ export default function SellerDashboard() {
                       <svg width="28" height="28" fill="none" stroke="#22c55e" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" /><path d="M8 12l2 2 4-4" /></svg>
                     ),
                     label: 'Aktif Gözlük',
-                    value: 0,
+                    value: statsLoading ? <CircularProgress size={24} /> : stats.activeGlasses,
                     color: 'success.main',
                   },
                   {
@@ -205,7 +277,7 @@ export default function SellerDashboard() {
                       <svg width="28" height="28" fill="none" stroke="#f59e42" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" /><path d="M12 19a3 3 0 006 0v-1" /></svg>
                     ),
                     label: 'Görüntülenme',
-                    value: 0,
+                    value: statsLoading ? <CircularProgress size={24} /> : stats.totalViews,
                     color: 'warning.main',
                   },
                   {
@@ -213,7 +285,7 @@ export default function SellerDashboard() {
                       <svg width="28" height="28" fill="none" stroke="#ef4444" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
                     ),
                     label: 'Beğeni',
-                    value: 0,
+                    value: statsLoading ? <CircularProgress size={24} /> : stats.totalLikes,
                     color: 'error.main',
                   },
                 ].map((stat, i) => (

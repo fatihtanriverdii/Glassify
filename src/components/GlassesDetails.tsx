@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
@@ -16,11 +16,12 @@ const GlassesDetails: React.FC<GlassesDetailsProps> = ({ isOpen, onClose, glassU
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'specs'>('details');
+  const fetchLock = useRef(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
-      if (!glassUrl) return;
-      
+      if (!glassUrl || fetchLock.current) return;
+      fetchLock.current = true;
       setLoading(true);
       setError(null);
       
@@ -35,6 +36,7 @@ const GlassesDetails: React.FC<GlassesDetailsProps> = ({ isOpen, onClose, glassU
         setError(err instanceof Error ? err.message : 'Ürün detayları alınamadı');
       } finally {
         setLoading(false);
+        fetchLock.current = false;
       }
     };
 

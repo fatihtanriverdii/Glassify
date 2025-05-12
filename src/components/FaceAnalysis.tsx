@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { tryOnGlasses } from '@/services/glassesService';
+import { tryOnGlasses, addFavorite, removeFavorite, increaseView } from '@/services/glassesService';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
@@ -164,25 +164,55 @@ export const FaceAnalysis: React.FC<{
     setSelectedGlassIndex(glasses.indexOf(glass));
   };
 
-  const handleViewDetails = (glass: Glass, e: React.MouseEvent) => {
+  const handleViewDetails = async (glass: Glass, e: React.MouseEvent) => {
     e.stopPropagation();
+    try {
+      await increaseView(glass.id);
+    } catch (err) {
+      toast({
+        title: 'Hata',
+        description: 'Görüntüleme arttırılamadı',
+        variant: 'destructive',
+        duration: 2000
+      });
+    }
     setSelectedGlassUrl(glass.link);
     setSelectedGlassImage(glass.image);
     setShowDetails(true);
   };
 
-  const toggleFavorite = (glass: Glass, e: React.MouseEvent) => {
+  const toggleFavorite = async (glass: Glass, e: React.MouseEvent) => {
     e.stopPropagation();
-    setFavoriteGlasses(prev => {
-      const isFavorite = prev.some(g => g.id === glass.id);
-      if (isFavorite) {
-        setLastFavoriteAction({ type: 'remove', glass });
-        return prev.filter(g => g.id !== glass.id);
-      } else {
-        setLastFavoriteAction({ type: 'add', glass });
-        return [...prev.filter(g => g.id !== glass.id), glass];
+    const isFav = favoriteGlasses.some(g => g.id === glass.id);
+    if (isFav) {
+      // Favoriden çıkar
+      setFavoriteGlasses(prev => prev.filter(g => g.id !== glass.id));
+      setLastFavoriteAction({ type: 'remove', glass });
+      try {
+        await removeFavorite(glass.id);
+      } catch (err) {
+        toast({
+          title: 'Hata',
+          description: 'Favoriden çıkarılamadı',
+          variant: 'destructive',
+          duration: 2000
+        });
       }
-    });
+    } else {
+      // Favorile
+      setFavoriteGlasses(prev => [...prev.filter(g => g.id !== glass.id), glass]);
+      setLastFavoriteAction({ type: 'add', glass });
+      try {
+        await addFavorite(glass.id);
+      } catch (err) {
+        toast({
+          title: 'Hata',
+          description: 'Favoriye eklenemedi',
+          variant: 'destructive',
+          duration: 2000
+        });
+      }
+    }
   };
 
   const isFavorite = (glass: Glass) => favoriteGlasses.some(g => g.id === glass.id);
