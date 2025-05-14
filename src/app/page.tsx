@@ -163,7 +163,18 @@ export default function Home() {
               </div>
               <div className="mb-6" ref={resultRef}>
                 <div className="flex flex-col items-center text-center">
-                  <span className="text-xl font-semibold text-[#111827] dark:text-gray-100">Yüz Şekli: {analysisResult.faceType}</span>
+                  <span className="text-xl font-semibold text-[#111827] dark:text-gray-100">Yüz Şekli: {
+                    (() => {
+                      const map: Record<string, string> = {
+                        'Round': 'Yuvarlak',
+                        'Square': 'Kare',
+                        'Oval': 'Oval',
+                        'Heart': 'Kalp',
+                        'Oblong': 'Dikdörtgen'
+                      };
+                      return map[analysisResult.faceType] || analysisResult.faceType;
+                    })()
+                  }</span>
                   <span className="text-lg text-gray-500 dark:text-gray-300">Güven Skoru: %{Math.min(100, (analysisResult.confidence)).toFixed(0)}</span>
                 </div>
               </div>

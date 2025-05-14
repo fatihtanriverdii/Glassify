@@ -141,7 +141,7 @@ export const AllGlassesList: React.FC<AllGlassesListProps> = ({ initialFaceType,
       <div className="flex justify-center sm:justify-end items-center mb-4 gap-4">
         <button
           onClick={() => setShowFavorites((prev: boolean) => !prev)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-900 border border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 font-semibold shadow hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-gray-900 border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 font-semibold shadow-lg hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 m-2"
           style={{ minWidth: 'fit-content' }}
         >
           <Heart className={showFavorites ? 'fill-red-500 text-red-500' : 'text-blue-600 dark:text-blue-400'} size={20} />
