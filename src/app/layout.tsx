@@ -9,8 +9,8 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Glassify - Yüz Şekli Analizi',
-  description: 'Yüz şeklinize en uygun gözlüğü bulun',
+  title: 'Glassify - Yüz Şekline Göre Akıllı Gözlük Öneri Sistemi',
+  description: 'Yüz şekline göre en uygun gözlüğü akıllı şekilde öneren sistem.',
 };
 
 export default function RootLayout({

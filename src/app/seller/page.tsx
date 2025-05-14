@@ -27,6 +27,34 @@ function parseJwt(token: string) {
   }
 }
 
+// Kart componenti
+type StatCardProps = {
+  image: string;
+  type: string;
+  stat: number;
+  statLabel: string;
+  statColor: string;
+  icon: string;
+  link: string;
+  buttonColor: string;
+};
+function StatCard({ image, type, stat, statLabel, statColor, icon, link, buttonColor }: StatCardProps) {
+  return (
+    <div className="flex flex-col items-center justify-between bg-white rounded-2xl shadow-md p-4 w-64 h-72">
+      <img src={`data:image/jpeg;base64,${image}`} alt="Gözlük" className="w-24 h-16 object-contain mb-3 mt-2" />
+      <div className="text-lg font-semibold text-gray-700 mb-1">{type}</div>
+      <div className={`flex items-center gap-2 text-sm font-medium mb-3 ${statColor}`}>
+        <span className="text-xl">{icon}</span>
+        {statLabel}: <span className="font-bold ml-1">{stat}</span>
+      </div>
+      <a href={link} target="_blank" rel="noopener noreferrer"
+         className={`w-full py-2 rounded-lg text-white text-base font-bold text-center transition ${buttonColor}`}>
+        Ürüne Git
+      </a>
+    </div>
+  );
+}
+
 export default function SellerDashboard() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
@@ -38,6 +66,10 @@ export default function SellerDashboard() {
     totalLikes: 0,
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [mostViewed, setMostViewed] = useState<any>(null);
+  const [mostLiked, setMostLiked] = useState<any>(null);
+  const [glassesLoading, setGlassesLoading] = useState(true);
+  const [glassesError, setGlassesError] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -55,6 +87,7 @@ export default function SellerDashboard() {
     const token = localStorage.getItem('token');
     if (!token) {
       setStatsLoading(false);
+      setGlassesLoading(false);
       return;
     }
     // Token'dan email'i bul
@@ -62,6 +95,7 @@ export default function SellerDashboard() {
     const email = decoded?.email;
     if (!email) {
       setStatsLoading(false);
+      setGlassesLoading(false);
       return;
     }
     fetch(`${API_URL}/User/statistics?email=${encodeURIComponent(email)}`, {
@@ -81,6 +115,33 @@ export default function SellerDashboard() {
         setStatsLoading(false);
       })
       .catch(() => setStatsLoading(false));
+
+    // En çok görüntülenen ve beğenilen gözlükleri çek
+    setGlassesLoading(true);
+    setGlassesError(false);
+    Promise.all([
+      fetch(`${API_URL}/User/most-viewed?email=${encodeURIComponent(email)}`, {
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token.replace('Bearer ', '')}`,
+        }
+      }).then(res => res.ok ? res.json() : null),
+      fetch(`${API_URL}/User/most-liked?email=${encodeURIComponent(email)}`, {
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token.replace('Bearer ', '')}`,
+        }
+      }).then(res => res.ok ? res.json() : null),
+    ])
+      .then(([viewed, liked]) => {
+        setMostViewed(viewed);
+        setMostLiked(liked);
+        setGlassesLoading(false);
+      })
+      .catch(() => {
+        setGlassesError(true);
+        setGlassesLoading(false);
+      });
   }, []);
 
   const handleNavigation = (path: string) => {
@@ -324,80 +385,49 @@ export default function SellerDashboard() {
                 ))}
               </Grid>
 
-              <Grid container spacing={2} alignItems="stretch">
-                <Grid item xs={12} md={6}>
-                  <Box sx={theme => ({
-                    p: 2.5,
-                    borderRadius: 3,
-                    minHeight: 120,
-                    bgcolor: theme.palette.mode === 'dark' ? '#232b3a' : '#fff',
-                    border: theme.palette.mode === 'dark' ? '1px solid #334155' : 'none',
-                    boxShadow: theme.palette.mode === 'dark'
-                      ? '0 4px 24px 0 rgba(0,0,0,0.25)'
-                      : '0 2px 8px 0 rgba(0,0,0,0.07)',
-                    color: theme.palette.mode === 'dark' ? '#e5e7eb' : 'inherit',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  })}>
-                    <Typography variant="subtitle1" gutterBottom sx={theme => ({ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: theme.palette.mode === 'dark' ? '#e5e7eb' : 'inherit' })}>
-                      <svg width="20" height="20" fill="none" stroke="#f59e42" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 12l2 2 4-4" /></svg>
-                      En Çok Görüntülenen Gözlükler
-                    </Typography>
-                    <Box sx={theme => ({
-                      flex: 1,
-                      minHeight: 32,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px dashed',
-                      borderColor: theme.palette.mode === 'dark' ? '#334155' : '#cbd5e1',
-                      borderRadius: 2,
-                      bgcolor: theme.palette.mode === 'dark' ? '#1e293b' : '#f8fafc',
-                    })}>
-                      <Typography variant="body2" sx={theme => ({ color: theme.palette.mode === 'dark' ? '#94a3b8' : 'text.secondary' })}>
-                        Gözlük verisi yakında eklenecek
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box sx={theme => ({
-                    p: 2.5,
-                    borderRadius: 3,
-                    minHeight: 120,
-                    bgcolor: theme.palette.mode === 'dark' ? '#232b3a' : '#fff',
-                    border: theme.palette.mode === 'dark' ? '1px solid #334155' : 'none',
-                    boxShadow: theme.palette.mode === 'dark'
-                      ? '0 4px 24px 0 rgba(0,0,0,0.25)'
-                      : '0 2px 8px 0 rgba(0,0,0,0.07)',
-                    color: theme.palette.mode === 'dark' ? '#e5e7eb' : 'inherit',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  })}>
-                    <Typography variant="subtitle1" gutterBottom sx={theme => ({ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, color: theme.palette.mode === 'dark' ? '#e5e7eb' : 'inherit' })}>
-                      <svg width="20" height="20" fill="none" stroke="#ef4444" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
-                      En Çok Beğenilen Gözlükler
-                    </Typography>
-                    <Box sx={theme => ({
-                      flex: 1,
-                      minHeight: 32,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px dashed',
-                      borderColor: theme.palette.mode === 'dark' ? '#334155' : '#cbd5e1',
-                      borderRadius: 2,
-                      bgcolor: theme.palette.mode === 'dark' ? '#1e293b' : '#f8fafc',
-                    })}>
-                      <Typography variant="body2" sx={theme => ({ color: theme.palette.mode === 'dark' ? '#94a3b8' : 'text.secondary' })}>
-                        Beğeni verisi yakında eklenecek
-                      </Typography>
-                    </Box>
-                  </Box>
+              <Grid container spacing={4}>
+                <Grid item xs={12}>
+                  <div className="flex flex-wrap justify-center items-stretch gap-8 w-full mt-2 mb-4 overflow-x-auto max-w-full">
+                    {mostViewed && mostViewed.image && (
+                      <div className="flex flex-col items-center rounded-2xl shadow-lg p-3 w-48 min-w-48 max-w-48 h-64 border-2 bg-white border-orange-400 dark:bg-slate-800 dark:border-orange-200">
+                        <span className="mb-2 inline-block text-center px-3 py-1 rounded-full text-xs font-bold shadow bg-orange-400 text-white dark:bg-orange-200 dark:text-orange-900 dark:opacity-90">
+                          En Çok Görüntülenen Gözlük
+                        </span>
+                        <img src={`data:image/jpeg;base64,${mostViewed.image}`} alt="Gözlük" className="w-16 h-10 object-contain my-4" />
+                        <div className="text-base font-semibold text-gray-700 dark:text-slate-100 mb-2">{mostViewed.glassesType}</div>
+                        <div className="flex items-center gap-2 text-sm font-bold text-orange-500 dark:text-orange-300 mb-2">
+                          <span className="text-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-orange-500 dark:text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M1.5 12s3.5-7 10.5-7 10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12z" />
+                              <circle cx="12" cy="12" r="3" fill="currentColor" />
+                            </svg>
+                          </span>
+                          Görüntülenme: <span className="ml-1">{mostViewed.views}</span>
+                        </div>
+                        <a href={mostViewed.link} target="_blank" rel="noopener noreferrer"
+                          className="w-full py-2 rounded-lg text-white text-base font-bold text-center transition bg-blue-600 hover:bg-blue-700 mt-auto dark:bg-blue-500 dark:hover:bg-blue-600">
+                          Ürüne Git
+                        </a>
+                      </div>
+                    )}
+                    {mostLiked && mostLiked.image && (
+                      <div className="flex flex-col items-center rounded-2xl shadow-lg p-3 w-48 min-w-48 max-w-48 h-64 border-2 bg-white border-red-400 dark:bg-slate-800 dark:border-red-200">
+                        <span className="mb-2 inline-block text-center px-3 py-1 rounded-full text-xs font-bold shadow bg-red-400 text-white dark:bg-red-200 dark:text-red-900 dark:opacity-90">
+                          En Çok Beğenilen Gözlük
+                        </span>
+                        <img src={`data:image/jpeg;base64,${mostLiked.image}`} alt="Gözlük" className="w-16 h-10 object-contain my-4" />
+                        <div className="text-base font-semibold text-gray-700 dark:text-slate-100 mb-2">{mostLiked.glassesType}</div>
+                        <div className="flex items-center gap-2 text-sm font-bold text-red-500 dark:text-red-300 mb-2">
+                          <span className="text-lg">❤️</span>
+                          Beğeni: <span className="ml-1">{mostLiked.likes}</span>
+                        </div>
+                        <a href={mostLiked.link} target="_blank" rel="noopener noreferrer"
+                          className="w-full py-2 rounded-lg text-white text-base font-bold text-center transition bg-red-500 hover:bg-red-600 mt-auto dark:bg-red-500 dark:hover:bg-red-600">
+                          Ürüne Git
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </Grid>
               </Grid>
             </Box>
