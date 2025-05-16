@@ -2,7 +2,7 @@
 
 import { FaRecycle, FaClock, FaRobot, FaDatabase } from "react-icons/fa6";
 import { MdFace, MdSecurity, MdPhonelink } from "react-icons/md";
-import { SiTensorflow, SiPython, SiReact, SiNextdotjs, SiOpencv, SiDotnet } from "react-icons/si";
+import { SiTensorflow, SiPython, SiReact, SiNextdotjs, SiDotnet, SiGooglecloud } from "react-icons/si";
 
 export default function AboutPage() {
   const features = [
@@ -43,7 +43,7 @@ export default function AboutPage() {
     { icon: <SiPython className="w-16 h-16" />, name: "Python" },
     { icon: <SiReact className="w-16 h-16" />, name: "React" },
     { icon: <SiNextdotjs className="w-16 h-16" />, name: "Next.js" },
-    { icon: <SiOpencv className="w-16 h-16" />, name: "OpenCV" },
+    { icon: <SiGooglecloud className="w-16 h-16" />, name: "Google Cloud" },
     { icon: <SiDotnet className="w-16 h-16" />, name: ".NET" },
     { icon: <FaDatabase className="w-16 h-16" />, name: "SQL Server" }
   ];
