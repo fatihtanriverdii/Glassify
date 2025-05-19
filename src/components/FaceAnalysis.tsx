@@ -124,39 +124,15 @@ export const FaceAnalysis: React.FC<{
     }
   };
 
-  const handleNextGlass = async () => {
-    try {
-      setGalleryLoading(true);
+  const handleNextGlass = () => {
+    if (currentPage < totalPages) {
       setCurrentPage(prev => prev + 1);
-      await fetchGlasses(currentPage + 1);
-    } catch (error) {
-      toast({
-        title: 'Hata',
-        description: 'Daha fazla gözlük bulunamadı',
-        variant: 'destructive',
-        duration: 2000
-      });
-    } finally {
-      setGalleryLoading(false);
     }
   };
 
-  const handlePrevGlass = async () => {
+  const handlePrevGlass = () => {
     if (currentPage > 1) {
-      try {
-        setGalleryLoading(true);
-        setCurrentPage(prev => prev - 1);
-        await fetchGlasses(currentPage - 1);
-      } catch (error) {
-        toast({
-          title: 'Hata',
-          description: 'Önceki gözlükler getirilemedi',
-          variant: 'destructive',
-          duration: 2000
-        });
-      } finally {
-        setGalleryLoading(false);
-      }
+      setCurrentPage(prev => prev - 1);
     }
   };
 
@@ -216,6 +192,12 @@ export const FaceAnalysis: React.FC<{
   };
 
   const isFavorite = (glass: Glass) => favoriteGlasses.some(g => g.id === glass.id);
+
+  useEffect(() => {
+    if (analysisResult.faceType) {
+      setCurrentPage(1);
+    }
+  }, [analysisResult.faceType]);
 
   useEffect(() => {
     if (analysisResult.faceType) {
